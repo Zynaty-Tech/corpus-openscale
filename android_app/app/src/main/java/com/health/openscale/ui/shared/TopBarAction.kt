@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 /**
  * @property tint Overrides the default icon color; use it to flag a state that must stay visible
  *   without giving up the icon itself (e.g. Bluetooth developer mode). `null` keeps the theme color.
+ * @property testTag Code name of the action for QA tools (`<Screen>.Action.<testTag>`); `null`
+ *   falls back to the content-description resource's entry name, then the icon's name.
  */
 data class TopBarAction(
     val icon: ImageVector,
@@ -32,5 +34,7 @@ data class TopBarAction(
     @param:StringRes val contentDescriptionResId: Int? = null,
     val contentDescription: String? = null,
     val tint: Color? = null,
+    // Before dropdownContent: callers pass that one as a trailing lambda.
+    val testTag: String? = null,
     val dropdownContent: (@Composable () -> Unit)? = null
 )

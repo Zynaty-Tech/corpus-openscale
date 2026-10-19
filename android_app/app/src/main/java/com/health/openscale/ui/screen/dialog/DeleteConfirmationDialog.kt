@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -45,9 +47,12 @@ fun DeleteConfirmationDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     title: String,
-    text: String
+    text: String,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "DeleteConfirmationDialog"),
         onDismissRequest = onDismissRequest,
         icon = { Icon(Icons.Default.Delete, contentDescription = null) },
         title = { Text(text = title) },
@@ -57,7 +62,7 @@ fun DeleteConfirmationDialog(
                 onClick = {
                     onConfirm()
                     onDismissRequest() // Dismiss the dialog after confirmation
-                }
+                }, modifier = controlTag("Button.delete_button_label")
             ) {
                 Text(
                     text = stringResource(R.string.delete_button_label),
@@ -66,7 +71,7 @@ fun DeleteConfirmationDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            TextButton(onClick = onDismissRequest, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }

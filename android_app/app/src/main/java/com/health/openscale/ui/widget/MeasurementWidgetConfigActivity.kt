@@ -17,6 +17,9 @@
  */
 package com.health.openscale.ui.widget
 
+import com.health.openscale.ui.qa.ScreenTagged
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.exposeTestTags
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
@@ -93,12 +96,17 @@ class MeasurementWidgetConfigActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                WidgetConfigScreen(
-                    onCancel = { finish() },
-                    onConfirm = { selectedTypeId, selectedTheme ->
-                        saveSelectionAndFinish(appWidgetId, selectedTypeId, selectedTheme)
+                // Its own activity, so its own composition root: expose tags here too (debug only).
+                Box(Modifier.fillMaxSize().exposeTestTags()) {
+                    ScreenTagged("WidgetConfig") {
+                        WidgetConfigScreen(
+                            onCancel = { finish() },
+                            onConfirm = { selectedTypeId, selectedTheme ->
+                                saveSelectionAndFinish(appWidgetId, selectedTypeId, selectedTheme)
+                            }
+                        )
                     }
-                )
+                }
             }
         }
     }
@@ -187,14 +195,15 @@ private fun WidgetConfigScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.measurement_type_settings_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onCancel) {
+                    IconButton(onClick = onCancel, modifier = controlTag("CancelButton")) {
                         Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel_button))
                     }
                 },
                 actions = {
                     IconButton(
                         onClick = { onConfirm(selectedId, selectedTheme) },
-                        enabled = selectedId != null
+                        enabled = selectedId != null,
+                        modifier = controlTag("ConfirmButton")
                     ) {
                         Icon(Icons.Default.Done, contentDescription = stringResource(R.string.confirm_button))
                     }
@@ -214,7 +223,7 @@ private fun WidgetConfigScreen(
                     Text(text = stringResource(R.string.no_entries_found))
                 }
             } else {
-                LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
+                LazyColumn(Modifier.fillMaxWidth().weight(1f).then(controlTag("TypeList"))) {
                     items(types, key = { it.id }) { type ->
                         TypeRow(
                             type = type,

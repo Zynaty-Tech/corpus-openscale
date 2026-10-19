@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.R.attr.contentDescription
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -195,21 +197,21 @@ fun AboutScreen(
             ExposedDropdownMenuBox(
                 expanded = scenarioExpanded,
                 onExpandedChange = { scenarioExpanded = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = controlTag("Dropdown.dev_tools_scenario_label").then(Modifier.fillMaxWidth())
             ) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.dev_tools_scenario_label), color = MaterialTheme.colorScheme.error) },
                     supportingContent = { Text(selectedScenario.getDisplayName(context), color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)) },
                     leadingContent = { Icon(Icons.Default.Timeline, null, tint = MaterialTheme.colorScheme.error) },
                     trailingContent = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = scenarioExpanded) },
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).clickable { scenarioExpanded = true },
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).then(controlTag("Tap")).clickable { scenarioExpanded = true },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
                 ExposedDropdownMenu(expanded = scenarioExpanded, onDismissRequest = { scenarioExpanded = false }) {
                     MeasurementDemoUseCase.DemoScenario.entries.forEach { scenario ->
                         DropdownMenuItem(
                             text = { Text(scenario.getDisplayName(context), color = MaterialTheme.colorScheme.error) },
-                            onClick = { selectedScenario = scenario; scenarioExpanded = false }
+                            onClick = { selectedScenario = scenario; scenarioExpanded = false }, modifier = controlTag("MenuItem")
                         )
                     }
                 }
@@ -220,21 +222,21 @@ fun AboutScreen(
             ExposedDropdownMenuBox(
                 expanded = rangeExpanded,
                 onExpandedChange = { rangeExpanded = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = controlTag("Dropdown.dev_tools_time_range_label").then(Modifier.fillMaxWidth())
             ) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.dev_tools_time_range_label), color = MaterialTheme.colorScheme.error) },
                     supportingContent = { Text(selectedRange.getDisplayName(context), color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)) },
                     leadingContent = { Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.error) },
                     trailingContent = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = rangeExpanded) },
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).clickable { rangeExpanded = true },
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).then(controlTag("Tap.dev_tools_wipe_data_label")).clickable { rangeExpanded = true },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
                 ExposedDropdownMenu(expanded = rangeExpanded, onDismissRequest = { rangeExpanded = false }) {
                     MeasurementDemoUseCase.TimeRange.entries.forEach { range ->
                         DropdownMenuItem(
                             text = { Text(range.getDisplayName(context), color = MaterialTheme.colorScheme.error) },
-                            onClick = { selectedRange = range; rangeExpanded = false }
+                            onClick = { selectedRange = range; rangeExpanded = false }, modifier = controlTag("MenuItem_2")
                         )
                     }
                 }
@@ -251,10 +253,10 @@ fun AboutScreen(
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.error,
                             checkedTrackColor = MaterialTheme.colorScheme.errorContainer
-                        )
+                        ), modifier = controlTag("Switch")
                     )
                 },
-                modifier = Modifier.clickable { wipeExisting = !wipeExisting },
+                modifier = Modifier.then(controlTag("Tap.dev_tools_generate_button")).clickable { wipeExisting = !wipeExisting },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             )
 
@@ -263,7 +265,7 @@ fun AboutScreen(
             // --- Generate Button ---
             TextButton(
                 onClick = { showConfirmDialog = true },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                modifier = controlTag("Button.dev_tools_generate_button").then(Modifier.fillMaxWidth().padding(horizontal = 16.dp)),
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
             ) {
                 Text(stringResource(R.string.dev_tools_generate_button).uppercase(), fontWeight = FontWeight.Bold)
@@ -272,6 +274,7 @@ fun AboutScreen(
             // --- Confirmation Dialog ---
             if (showConfirmDialog) {
                 AlertDialog(
+                    modifier = overlayRoot("DemoDataDialog"),
                     onDismissRequest = { showConfirmDialog = false },
                     icon = { Icon(Icons.Default.WarningAmber, null, tint = MaterialTheme.colorScheme.error) },
                     title = { Text(stringResource(R.string.dev_tools_dialog_title)) },
@@ -285,11 +288,11 @@ fun AboutScreen(
                                 sharedViewModel.generateDemoData(selectedScenario, selectedRange, wipeExisting)
                                 showConfirmDialog = false
                             },
-                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), modifier = controlTag("Button.dev_tools_dialog_confirm")
                         ) { Text(stringResource(R.string.dev_tools_dialog_confirm)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showConfirmDialog = false }) { Text(stringResource(R.string.cancel_button)) }
+                        TextButton(onClick = { showConfirmDialog = false }, modifier = controlTag("Button.cancel_button")) { Text(stringResource(R.string.cancel_button)) }
                     }
                 )
             }
@@ -318,7 +321,7 @@ private fun InfoListItem(
     uriHandler: UriHandler? = null
 ) {
     val itemModifier = if (url != null && uriHandler != null) {
-        Modifier.clickable {
+        Modifier.then(controlTag("Tap.error_opening_link")).clickable {
             try {
                 uriHandler.openUri(url)
             } catch (e: Exception) {

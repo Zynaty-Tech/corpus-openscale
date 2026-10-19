@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -57,11 +59,14 @@ import com.health.openscale.core.data.Limb
 fun AmputationInputDialog(
     currentAmputations: Map<Limb, AmputationPart>,
     onDismiss: () -> Unit,
-    onSave: (Map<Limb, AmputationPart>) -> Unit
+    onSave: (Map<Limb, AmputationPart>) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     var selection by remember { mutableStateOf(currentAmputations) }
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "AmputationInputDialog"),
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.amputation_correction_label)) },
         text = {
@@ -94,12 +99,12 @@ fun AmputationInputDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(selection) }) {
+            TextButton(onClick = { onSave(selection) }, modifier = controlTag("Button.dialog_ok")) {
                 Text(stringResource(R.string.dialog_ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }
@@ -129,7 +134,7 @@ private fun AmputationRow(
         Row(
             modifier = Modifier
                 .weight(1f)
-                .clickable(
+                .then(controlTag("Tap")).clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = {
@@ -144,7 +149,7 @@ private fun AmputationRow(
         ) {
             Checkbox(
                 checked = isChecked,
-                onCheckedChange = null
+                onCheckedChange = null, modifier = controlTag("Checkbox")
             )
             Spacer(Modifier.width(8.dp))
             Text(label)
@@ -154,7 +159,7 @@ private fun AmputationRow(
             if (selection != null) {
                 ExposedDropdownMenuBox(
                     expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+                    onExpandedChange = { expanded = !expanded }, modifier = controlTag("Dropdown")
                 ) {
                     OutlinedTextField(
                         value = stringResource(id = selection.displayNameResId),
@@ -162,7 +167,7 @@ private fun AmputationRow(
                         readOnly = true,
                         singleLine = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                        modifier = controlTag("Field").then(Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true))
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -174,7 +179,7 @@ private fun AmputationRow(
                                 onClick = {
                                     onSelectionChange(level)
                                     expanded = false
-                                }
+                                }, modifier = controlTag("MenuItem")
                             )
                         }
                     }

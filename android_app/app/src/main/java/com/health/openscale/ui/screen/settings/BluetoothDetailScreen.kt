@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -150,7 +151,7 @@ fun BluetoothDetailScreen(
         ExposedDropdownMenuBox(
             expanded = tuningDropdownExpanded,
             onExpandedChange = { tuningDropdownExpanded = !tuningDropdownExpanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = controlTag("Dropdown.tuning_profile_label").then(Modifier.fillMaxWidth())
         ) {
             OutlinedTextField(
                 value = stringResource(id = currentTuningProfile.labelRes),
@@ -163,10 +164,10 @@ fun BluetoothDetailScreen(
                         contentDescription = null
                     )
                 },                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tuningDropdownExpanded) },
-                modifier = Modifier
+                modifier = controlTag("Field.tuning_profile_label").then(Modifier
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable)
                     .fillMaxWidth()
-                    .clickable { tuningDropdownExpanded = true },
+                    .then(controlTag("Tap")).clickable { tuningDropdownExpanded = true }),
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
@@ -186,7 +187,7 @@ fun BluetoothDetailScreen(
                         onClick = {
                             scope.launch { bluetoothViewModel.setSavedTuning(profile) }
                             tuningDropdownExpanded = false
-                        }
+                        }, modifier = controlTag("MenuItem")
                     )
                 }
             }
@@ -202,7 +203,7 @@ fun BluetoothDetailScreen(
         ) {
             Switch(
                 checked         = autoConnectOnStartup,
-                onCheckedChange = null,
+                onCheckedChange = null, modifier = controlTag("Switch"),
             )
         }
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -214,7 +215,7 @@ fun BluetoothDetailScreen(
                 ) {
                     Switch(
                         checked = isSmartAssignmentEnabled,
-                        onCheckedChange = null
+                        onCheckedChange = null, modifier = controlTag("Switch_2")
                     )
                 }
 
@@ -238,7 +239,7 @@ fun BluetoothDetailScreen(
                         ) {
                             Switch(
                                 checked = ignoreOutsideTolerance,
-                                onCheckedChange = null
+                                onCheckedChange = null, modifier = controlTag("Switch_3")
                             )
                         }
                     }
@@ -259,7 +260,7 @@ fun BluetoothDetailScreen(
                 ) {
                     Switch(
                         checked = isDeveloperActive,
-                        onCheckedChange = null
+                        onCheckedChange = null, modifier = controlTag("Switch_4")
                     )
                 }
 
@@ -305,7 +306,7 @@ fun BluetoothDetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
+                .then(controlTag("Tap.bluetooth_remove_saved_device")).clickable {
                     bluetoothViewModel.removeSavedDevice()
                     navController.popBackStack()
                 },
@@ -352,7 +353,7 @@ private fun SettingsRow(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.then(controlTag("Tap_2")).clickable(onClick = onClick) else Modifier)
     ) {
         Row(
             modifier = Modifier.padding(vertical = 8.dp),

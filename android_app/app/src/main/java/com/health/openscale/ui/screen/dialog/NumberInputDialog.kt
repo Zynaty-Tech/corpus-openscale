@@ -1,5 +1,7 @@
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,12 +54,12 @@ private fun ValueStepper(onStep: (isIncrement: Boolean) -> Unit) {
         Icon(
             imageVector        = Icons.Default.KeyboardArrowUp,
             contentDescription = stringResource(R.string.content_desc_increase_value, ""),
-            modifier           = Modifier.size(24.dp).clickable { onStep(true) },
+            modifier           = Modifier.size(24.dp).then(controlTag("Tap.content_desc_decrease_value")).clickable { onStep(true) },
         )
         Icon(
             imageVector        = Icons.Default.KeyboardArrowDown,
             contentDescription = stringResource(R.string.content_desc_decrease_value, ""),
-            modifier           = Modifier.size(24.dp).clickable { onStep(false) },
+            modifier           = Modifier.size(24.dp).then(controlTag("Tap")).clickable { onStep(false) },
         )
     }
 }
@@ -180,7 +182,7 @@ fun NumberInputField(
                             stText = cur.toString()
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = controlTag("Field").then(Modifier.weight(1f)),
                 )
                 OutlinedTextField(
                     value           = lbText,
@@ -203,7 +205,7 @@ fun NumberInputField(
                             lbText = nLb.toString()
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = controlTag("Field_2").then(Modifier.weight(1f)),
                 )
             }
         } else {
@@ -261,12 +263,12 @@ fun NumberInputField(
                         }
                     }
                 },
-                modifier = Modifier
+                modifier = controlTag("Field.dialog_title_input_value").then(Modifier
                     .fillMaxWidth()
                     .then(
                         if (focusRequester != null) Modifier.focusRequester(focusRequester)
                         else Modifier
-                    ),
+                    )),
             )
         }
     }
@@ -285,6 +287,8 @@ fun NumberInputDialog(
     iconBackgroundColor: Color,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     var currentValue   by remember(initialValue, unit, inputType) { mutableStateOf(initialValue) }
     val focusRequester = remember { FocusRequester() }
@@ -294,9 +298,10 @@ fun NumberInputDialog(
     }
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "NumberInputDialog"),
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = { onConfirm(currentValue) }) {
+            TextButton(onClick = { onConfirm(currentValue) }, modifier = controlTag("Button.dialog_ok")) {
                 Text(stringResource(R.string.dialog_ok))
             }
         },
@@ -304,10 +309,10 @@ fun NumberInputDialog(
             TextButton(onClick = {
                 currentValue = ""
                 focusRequester.requestFocus()
-            }) {
+            }, modifier = controlTag("Button.clear_button")) {
                 Text(stringResource(R.string.clear_button))
             }
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         },

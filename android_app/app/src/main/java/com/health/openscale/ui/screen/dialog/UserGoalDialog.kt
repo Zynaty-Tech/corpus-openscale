@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -163,6 +165,7 @@ fun UserGoalDialog(
         val typeName = selectedTypeState?.getDisplayName(context)
             ?: resources.getString(R.string.measurement_type_custom_default_name)
         DeleteConfirmationDialog(
+            overlayTag = "GoalDeleteDialog",
             onDismissRequest = { showDeleteDialog = false },
             onConfirm = {
                 if (existingUserGoal != null) {
@@ -180,18 +183,19 @@ fun UserGoalDialog(
             initialSelectedDateMillis = localStartOfDayToPickerMillis(startDateMillis)
         )
         DatePickerDialog(
+            modifier = overlayRoot("GoalStartDatePicker"),
             onDismissRequest = { showStartDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     startPickerState.selectedDateMillis
                         ?.let { startDateMillis = pickerMillisToLocalStartOfDay(it) }
                     showStartDatePicker = false
-                }) {
+                }, modifier = controlTag("Button.dialog_ok")) {
                     Text(stringResource(R.string.dialog_ok))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showStartDatePicker = false }) {
+                TextButton(onClick = { showStartDatePicker = false }, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(R.string.cancel_button))
                 }
             }
@@ -203,12 +207,13 @@ fun UserGoalDialog(
     if (showGoalDatePicker) {
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
         DatePickerDialog(
+            modifier = overlayRoot("GoalDatePicker"),
             onDismissRequest = { showGoalDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     selectedDateMillis = datePickerState.selectedDateMillis
                     showGoalDatePicker = false
-                }) {
+                }, modifier = controlTag("Button.dialog_ok_2")) {
                     Text(stringResource(R.string.dialog_ok))
                 }
             },
@@ -217,11 +222,11 @@ fun UserGoalDialog(
                     TextButton(onClick = {
                         selectedDateMillis = null
                         showGoalDatePicker = false
-                    }) {
+                    }, modifier = controlTag("Button.text_none")) {
                         Text(stringResource(R.string.text_none))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(onClick = { showGoalDatePicker = false }) {
+                    TextButton(onClick = { showGoalDatePicker = false }, modifier = controlTag("Button.cancel_button_2")) {
                         Text(stringResource(R.string.cancel_button))
                     }
                 }
@@ -239,6 +244,7 @@ fun UserGoalDialog(
     }
 
     AlertDialog(
+        modifier = overlayRoot("UserGoalDialog"),
         onDismissRequest = onDismiss,
         title = { Text(dialogTitle) },
         text = {
@@ -257,7 +263,7 @@ fun UserGoalDialog(
                                 typeDropdownExpanded = !typeDropdownExpanded
                             }
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = controlTag("Dropdown.info_no_targetable_types").then(Modifier.weight(1f))
                     ) {
                         OutlinedTextField(
                             value = selectedTypeState?.getDisplayName(context)
@@ -282,7 +288,7 @@ fun UserGoalDialog(
                                                 selectedTypeState?.let {
                                                     navController.navigate(Routes.measurementTypeDetail(typeId = it.id))
                                                 }
-                                            },
+                                            }, modifier = controlTag("IconButton.content_desc_edit_type"),
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.Edit,
@@ -299,9 +305,9 @@ fun UserGoalDialog(
                                     }
                                 }
                             },
-                            modifier = Modifier
+                            modifier = controlTag("Field.info_no_targetable_types").then(Modifier
                                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()),
                             enabled = !isEditing && targetableTypes.isNotEmpty()
                         )
                         if (!isEditing && targetableTypes.isNotEmpty()) {
@@ -320,7 +326,7 @@ fun UserGoalDialog(
                                                 selectedTypeState = type
                                             }
                                             typeDropdownExpanded = false
-                                        }
+                                        }, modifier = controlTag("MenuItem")
                                     )
                                 }
                             }
@@ -335,7 +341,7 @@ fun UserGoalDialog(
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(R.string.goal_start_date_label)) },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = controlTag("Field.goal_start_date_label").then(Modifier.fillMaxWidth()),
                             trailingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
@@ -346,7 +352,7 @@ fun UserGoalDialog(
                         Box(
                             modifier = Modifier
                                 .matchParentSize()
-                                .clickable(onClick = {
+                                .then(controlTag("Tap.measurement_type_label_goal")).clickable(onClick = {
                                     showStartDatePicker = true
                                 })
                         )
@@ -375,7 +381,7 @@ fun UserGoalDialog(
                                     )
                                 )
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = controlTag("Field.label_optional").then(Modifier.fillMaxWidth()),
                             trailingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
@@ -386,7 +392,7 @@ fun UserGoalDialog(
                         Box(
                             modifier = Modifier
                                 .matchParentSize()
-                                .clickable(onClick = {
+                                .then(controlTag("Tap.toast_select_measurement_type")).clickable(onClick = {
                                     showGoalDatePicker = true
                                 })
                         )
@@ -419,7 +425,7 @@ fun UserGoalDialog(
                     onConfirm(type.id, goalValue, selectedDateMillis, startDateMillis)
                     onDismiss()
                 },
-                enabled = selectedTypeState != null && currentGoalValueString.isNotBlank()
+                enabled = selectedTypeState != null && currentGoalValueString.isNotBlank(), modifier = controlTag("Button.toast_select_measurement_type")
             ) {
                 Text(stringResource(R.string.dialog_ok))
             }
@@ -428,7 +434,7 @@ fun UserGoalDialog(
             Row {
                 if (isEditing && selectedTypeState != null) {
                     TextButton(
-                        onClick = { showDeleteDialog = true }
+                        onClick = { showDeleteDialog = true }, modifier = controlTag("Button.delete_button_label")
                     ) {
                         Text(
                             stringResource(R.string.delete_button_label),
@@ -437,7 +443,7 @@ fun UserGoalDialog(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button_3")) {
                     Text(stringResource(R.string.cancel_button))
                 }
             }

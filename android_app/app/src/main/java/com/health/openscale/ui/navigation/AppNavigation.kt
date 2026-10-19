@@ -99,6 +99,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import com.health.openscale.BuildConfig
 import com.health.openscale.R
+import com.health.openscale.ui.qa.LocalScreenName
+import com.health.openscale.ui.qa.screenNameOf
+import com.health.openscale.ui.qa.screenTag
+import com.health.openscale.ui.shared.TopBarAction
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.testTag
 import com.health.openscale.core.data.IconResource
 import com.health.openscale.core.data.User
 import com.health.openscale.ui.navigation.Routes.getIconForRoute
@@ -143,6 +149,8 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
     // Observe the current navigation route
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
+    // mqa tag name of the showing destination; the top bar and drawer live outside the NavHost.
+    val currentScreenName = screenNameOf(currentRoute)
 
     // Define the main navigation routes that appear in the navigation drawer
     val mainRoutes = listOf(
@@ -255,7 +263,8 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
         drawerState = drawerState,
         gesturesEnabled = !useNavigationRail,
         drawerContent = {
-            ModalDrawerSheet {
+            // mqa: the open drawer is an overlay of the screen under it.
+            ModalDrawerSheet(modifier = Modifier.screenTag("${currentScreenName ?: "App"}.Drawer")) {
                 // Drawer Header: Displays the app logo and name.
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -311,6 +320,7 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
                             },
                             label = { Text(titleText) },
                             selected = activeMainRoute == route, // Highlights the item if its section is showing.
+                            modifier = Modifier.testTag("${currentScreenName ?: "App"}.Drawer.${screenNameOf(route)}"),
                             onClick = {
                                 navigateToMainRoute(route)
                                 scope.launch { drawerState.close() } // Close the drawer after selection.
@@ -334,6 +344,7 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
         Row {
             if (useNavigationRail) {
                 AppNavigationRail(
+                    hostName = currentScreenName ?: "App",
                     mainRoutes = mainRoutes,
                     activeMainRoute = activeMainRoute,
                     onNavigate = navigateToMainRoute
@@ -386,9 +397,10 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
                         navigationIcon = {
                             if (currentRoute in mainRoutes) {
                                 // Show menu icon for main routes to open the drawer.
-                                if (!useNavigationRail) IconButton(onClick = {
-                                    scope.launch { drawerState.open() }
-                                }) {
+                                if (!useNavigationRail) IconButton(
+                                    onClick = { scope.launch { drawerState.open() } },
+                                    modifier = Modifier.testTag("${currentScreenName ?: "App"}.MenuButton")
+                                ) {
                                     Icon(
                                         Icons.Default.Menu,
                                         contentDescription = stringResource(R.string.content_desc_open_menu)
@@ -401,10 +413,13 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
                                 // intercepts, the NavHost handles it as a normal back.
                                 val backDispatcher =
                                     LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-                                IconButton(onClick = {
-                                    if (backDispatcher != null) backDispatcher.onBackPressed()
-                                    else navController.popBackStack()
-                                }) {
+                                IconButton(
+                                    onClick = {
+                                        if (backDispatcher != null) backDispatcher.onBackPressed()
+                                        else navController.popBackStack()
+                                    },
+                                    modifier = Modifier.testTag("${currentScreenName ?: "App"}.BackButton")
+                                ) {
                                     Icon(
                                         Icons.AutoMirrored.Filled.ArrowBack,
                                         contentDescription = stringResource(R.string.content_desc_back)
@@ -417,7 +432,12 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
                             topBarActions.forEach { action ->
                                 val contentDesc = action.contentDescriptionResId?.let { stringResource(id = it) }
                                     ?: action.contentDescription
-                                IconButton(onClick = action.onClick) {
+                                IconButton(
+                                    onClick = action.onClick,
+                                    modifier = Modifier.testTag(
+                                        "${currentScreenName ?: "App"}.Action.${actionCodeName(action)}"
+                                    )
+                                ) {
                                     Icon(
                                         imageVector = action.icon,
                                         contentDescription = contentDesc,
@@ -426,12 +446,15 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
                                 }
                                 // If the action has associated dropdown content, invoke it here.
                                 // This allows TopAppBar actions to also host DropdownMenus.
-                                action.dropdownContent?.invoke()
+                                CompositionLocalProvider(LocalScreenName provides currentScreenName) {
+                                    action.dropdownContent?.invoke()
+                                }
                             }
 
                             // Show user switcher dropdown if on a main route and users exist.
                             if (!isInContextualSelectionMode && currentRoute in mainRoutes && allUsers.isNotEmpty() && currentRoute != Routes.SETTINGS) {
                                 UserDropdownAsAction(
+                                    hostName = currentScreenName ?: "App",
                                     users = allUsers,
                                     selectedUser = selectedUser,
                                     onUserSelected = { userId ->
@@ -460,6 +483,19 @@ fun AppNavigation(sharedViewModel: SharedViewModel) {
     }
 }
 
+/**
+ * A stable code name for a top-bar action: the content-description resource's entry name, else
+ * the icon's name. Never the translated text.
+ */
+@Composable
+private fun actionCodeName(action: TopBarAction): String {
+    val resources = LocalResources.current
+    val raw = action.testTag
+        ?: action.contentDescriptionResId?.let { runCatching { resources.getResourceEntryName(it) }.getOrNull() }
+        ?: action.icon.name
+    return raw.replace(Regex("[^A-Za-z0-9_]"), "_")
+}
+
 @Composable
 private fun mainRouteTitle(route: String): String {
     val titleResId = Routes.getTitleResourceId(route)
@@ -476,6 +512,7 @@ private fun mainRouteTitle(route: String): String {
  */
 @Composable
 private fun AppNavigationRail(
+    hostName: String,
     mainRoutes: List<String>,
     activeMainRoute: String?,
     onNavigate: (String) -> Unit
@@ -494,6 +531,7 @@ private fun AppNavigationRail(
                 NavigationRailItem(
                     selected = activeMainRoute == route,
                     onClick = { onNavigate(route) },
+                    modifier = Modifier.testTag("$hostName.Rail.${screenNameOf(route)}"),
                     icon = { Icon(imageVector = getIconForRoute(route), contentDescription = null) },
                     label = {
                         Text(
@@ -522,6 +560,7 @@ private fun AppNavigationRail(
  */
 @Composable
 fun UserDropdownAsAction(
+    hostName: String,
     users: List<User>,
     selectedUser: User?,
     onUserSelected: (Int) -> Unit,
@@ -535,7 +574,7 @@ fun UserDropdownAsAction(
     }
 
     Box(modifier = modifier) { // Box is used to anchor the DropdownMenu.
-        IconButton(onClick = { expanded = true }) {
+        IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("$hostName.UserSwitcher")) {
             val iconResource = selectedUser?.icon?.resource ?: IconResource.VectorResource(Icons.Filled.AccountCircle)
 
             when (iconResource) {
@@ -559,6 +598,7 @@ fun UserDropdownAsAction(
         ) {
             users.forEach { user ->
                 DropdownMenuItem(
+                    modifier = Modifier.testTag("$hostName.UserSwitcher.User"),
                     text = { Text(user.name) },
                     onClick = {
                         onUserSelected(user.id)
@@ -576,6 +616,7 @@ fun UserDropdownAsAction(
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp)) // Visual separator.
             DropdownMenuItem(
+                modifier = Modifier.testTag("$hostName.UserSwitcher.ManageUsers"),
                 text = { Text(stringResource(R.string.manage_users)) },
                 onClick = {
                     onManageUsersClicked()

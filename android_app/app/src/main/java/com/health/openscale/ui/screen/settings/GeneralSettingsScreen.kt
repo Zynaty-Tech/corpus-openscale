@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -206,6 +208,7 @@ fun GeneralSettingsScreen(
 
     if (showLoggingActivationDialog) {
         AlertDialog(
+            modifier = overlayRoot("FileLoggingDialog"),
             onDismissRequest = { showLoggingActivationDialog = false },
             title = { Text(text = stringResource(R.string.enable_file_logging_dialog_title)) },
             text = {
@@ -255,11 +258,11 @@ fun GeneralSettingsScreen(
                             )
                         }
                         showLoggingActivationDialog = false
-                    }
+                    }, modifier = controlTag("Button.file_logging_enabled_snackbar")
                 ) { Text(stringResource(R.string.enable_button)) }
             },
             dismissButton = {
-                TextButton(onClick = { showLoggingActivationDialog = false }) {
+                TextButton(onClick = { showLoggingActivationDialog = false }, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(R.string.cancel_button))
                 }
             }
@@ -301,7 +304,7 @@ fun GeneralSettingsScreen(
             ExposedDropdownMenuBox(
                 expanded = expandedLanguageMenu,
                 onExpandedChange = { expandedLanguageMenu = !expandedLanguageMenu },
-                modifier = Modifier.fillMaxWidth()
+                modifier = controlTag("Dropdown.settings_language_label").then(Modifier.fillMaxWidth())
             ) {
                 OutlinedTextField(
                     value = selectedLanguage.nativeDisplayName,
@@ -317,9 +320,9 @@ fun GeneralSettingsScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLanguageMenu)
                     },
-                    modifier = Modifier
+                    modifier = controlTag("Field.settings_language_label").then(Modifier
                         .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth()
+                        .fillMaxWidth())
                 )
 
                 ExposedDropdownMenu(
@@ -339,7 +342,7 @@ fun GeneralSettingsScreen(
                                 }
                                 expandedLanguageMenu = false
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = controlTag("MenuItem").then(Modifier.fillMaxWidth())
                         )
                     }
                 }
@@ -470,7 +473,7 @@ fun GeneralSettingsScreen(
                             settingsViewModel.requestReminderReschedule()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = controlTag("Field.settings_reminder_text_label").then(Modifier.fillMaxWidth()),
                     singleLine = true,
                     label = { Text(stringResource(id = R.string.settings_reminder_text_label)) },
                     placeholder = { Text(stringResource(id = R.string.settings_reminder_text_placeholder)) }
@@ -479,9 +482,9 @@ fun GeneralSettingsScreen(
                 ExposedDropdownMenuBox(
                     expanded = expandedDays,
                     onExpandedChange = { expandedDays = !expandedDays },
-                    modifier = Modifier
+                    modifier = controlTag("Dropdown.settings_reminder_days_label").then(Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp)
+                        .padding(top = 12.dp))
                 ) {
                     OutlinedTextField(
                         value = selectedDaysLabel(reminderDays),
@@ -489,9 +492,9 @@ fun GeneralSettingsScreen(
                         readOnly = true,
                         label = { Text(stringResource(R.string.settings_reminder_days_label)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDays) },
-                        modifier = Modifier
+                        modifier = controlTag("Field.settings_reminder_days_label").then(Modifier
                             .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
+                            .fillMaxWidth())
                     )
                     ExposedDropdownMenu(
                         expanded = expandedDays,
@@ -503,7 +506,7 @@ fun GeneralSettingsScreen(
                             DropdownMenuItem(
                                 text = {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(checked = selected, onCheckedChange = null)
+                                        Checkbox(checked = selected, onCheckedChange = null, modifier = controlTag("Checkbox"))
                                         Text(text = label, modifier = Modifier.padding(start = 8.dp))
                                     }
                                 },
@@ -516,7 +519,7 @@ fun GeneralSettingsScreen(
                                         settingsViewModel.requestReminderReschedule()
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = controlTag("MenuItem_2").then(Modifier.fillMaxWidth())
                             )
                         }
                     }
@@ -534,7 +537,7 @@ fun GeneralSettingsScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
-                    OutlinedButton(onClick = { showTimePicker = true }) {
+                    OutlinedButton(onClick = { showTimePicker = true }, modifier = controlTag("Button")) {
                         val hh = reminderHour.toString().padStart(2, '0')
                         val mm = reminderMinute.toString().padStart(2, '0')
                         Text("$hh:$mm")
@@ -628,7 +631,7 @@ fun GeneralSettingsScreen(
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = controlTag("Button.log_export_no_app_error").then(Modifier.fillMaxWidth())
                     ) {
                         Text(stringResource(R.string.export_log_file_button))
                     }
@@ -692,7 +695,7 @@ fun SettingsGroup(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .semantics { contentDescription = title }
-                .clickable { onCheckedChange(!checked) },
+                .then(controlTag("Tap")).clickable { onCheckedChange(!checked) },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -704,7 +707,7 @@ fun SettingsGroup(
                     modifier = Modifier.padding(start = if (leadingIcon != null) 12.dp else 0.dp),
                 )
             }
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
+            Switch(checked = checked, onCheckedChange = onCheckedChange, modifier = controlTag("Switch"))
         }
 
         if (!summary.isNullOrBlank()) {

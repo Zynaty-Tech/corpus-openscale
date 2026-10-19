@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -94,6 +96,7 @@ fun BluetoothUserInteractionDialog(
         }
 
         AlertDialog(
+            modifier = overlayRoot("BluetoothUserInteractionDialog"),
             onDismissRequest = {
                 bluetoothViewModel.clearPendingUserInteraction()
             },
@@ -127,12 +130,12 @@ fun BluetoothUserInteractionDialog(
                                 LogManager.d(TAG, "CHOOSE_USER: Indices (length ${choiceIndices.size}): ${choiceIndices.joinToString()}")
 
                                 if (choiceDisplayNames.isNotEmpty() && choiceDisplayNames.size == choiceIndices.size) {
-                                    LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+                                    LazyColumn(modifier = controlTag("List").then(Modifier.padding(top = 8.dp))) {
                                         itemsIndexed(choiceDisplayNames) { itemIndex, choiceName ->
                                             Row(
                                                 Modifier
                                                     .fillMaxWidth()
-                                                    .selectable(
+                                                    .then(controlTag("Tap")).selectable(
                                                         selected = (choiceIndices[itemIndex] == selectedUserIndexState),
                                                         onClick = {
                                                             selectedUserIndexState =
@@ -144,7 +147,7 @@ fun BluetoothUserInteractionDialog(
                                             ) {
                                                 RadioButton(
                                                     selected = (choiceIndices[itemIndex] == selectedUserIndexState),
-                                                    onClick = { selectedUserIndexState = choiceIndices[itemIndex] }
+                                                    onClick = { selectedUserIndexState = choiceIndices[itemIndex] }, modifier = controlTag("RadioButton")
                                                 )
                                                 Spacer(modifier = Modifier.width(8.dp))
                                                 Text(text = choiceName.toString())
@@ -165,7 +168,7 @@ fun BluetoothUserInteractionDialog(
                                 label = { Text(stringResource(R.string.dialog_bt_label_consent_code)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = controlTag("Field.dialog_bt_label_consent_code").then(Modifier.fillMaxWidth())
                             )
                         }
                         // else -> { /* Handle unknown types or provide defaults */ } // Optional
@@ -203,7 +206,7 @@ fun BluetoothUserInteractionDialog(
                     enabled = when (interactionEvent.interactionType) {
                         UserInteractionType.CHOOSE_USER -> selectedUserIndexState != Int.MIN_VALUE
                         UserInteractionType.ENTER_CONSENT -> isConsentInputValid
-                    }
+                    }, modifier = controlTag("Button.dialog_bt_select_user_prompt")
                 ) {
                     Text(stringResource(R.string.confirm_button))
                 }
@@ -212,7 +215,7 @@ fun BluetoothUserInteractionDialog(
                 TextButton(
                     onClick = {
                         bluetoothViewModel.clearPendingUserInteraction()
-                    }
+                    }, modifier = controlTag("Button.cancel_button")
                 ) {
                     Text(stringResource(R.string.cancel_button))
                 }

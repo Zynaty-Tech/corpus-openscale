@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.overview
 
+import com.health.openscale.ui.qa.controlTag
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -436,7 +437,7 @@ fun OverviewScreen(
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .clickable {
+                                                .then(controlTag("Tap")).clickable {
                                                     scope.launch {
                                                         sharedViewModel.setMyGoalsExpandedOverview(
                                                             !isGoalsSectionExpanded
@@ -476,7 +477,7 @@ fun OverviewScreen(
                                         AnimatedVisibility(visible = isGoalsSectionExpanded) {
                                             Column {
                                                 LazyRow(
-                                                    modifier            = Modifier.fillMaxWidth(),
+                                                    modifier            = controlTag("Row").then(Modifier.fillMaxWidth()),
                                                     contentPadding      = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                                                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                                                 ) {
@@ -556,9 +557,9 @@ fun OverviewScreen(
                                 // ── Main list ─────────────────────────────────────────────
                                 LazyColumn(
                                     state                 = listState,
-                                    modifier              = listModifier
+                                    modifier              = controlTag("List").then(listModifier
                                         .fillMaxSize()
-                                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                                        .padding(horizontal = 16.dp, vertical = 4.dp)),
                                     verticalArrangement   = Arrangement.spacedBy(12.dp),
                                 ) {
                                     itemsIndexed(
@@ -826,7 +827,7 @@ fun MeasurementCard(
     }
 
     Card(
-        modifier  = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier  = Modifier.fillMaxWidth().then(controlTag("Tap_2")).clickable(onClick = onClick),
         border    = if (isHighlighted) highlightBorder else null,
         colors    = if (isHighlighted)
             CardDefaults.cardColors(containerColor = highlightColor)
@@ -850,7 +851,7 @@ fun MeasurementCard(
                 val actionIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
 
                 if (isAggregated) {
-                    IconButton(onClick = onEdit, modifier = Modifier.size(iconButtonSize)) {
+                    IconButton(onClick = onEdit, modifier = controlTag("IconButton.ChevronRight").then(Modifier.size(iconButtonSize))) {
                         Icon(
                             Icons.Default.ChevronRight,
                             contentDescription = null,
@@ -859,7 +860,7 @@ fun MeasurementCard(
                     }
                 } else {
                     if (onDelete != null) {
-                        IconButton(onClick = onDelete, modifier = Modifier.size(iconButtonSize)) {
+                        IconButton(onClick = onDelete, modifier = controlTag("IconButton.action_delete_measurement_desc").then(Modifier.size(iconButtonSize))) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.action_delete_measurement_desc, headerLabel),
@@ -867,7 +868,7 @@ fun MeasurementCard(
                             )
                         }
                     }
-                    IconButton(onClick = onEdit, modifier = Modifier.size(iconButtonSize)) {
+                    IconButton(onClick = onEdit, modifier = controlTag("IconButton.action_edit_measurement_desc").then(Modifier.size(iconButtonSize))) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = stringResource(R.string.action_edit_measurement_desc, headerLabel),
@@ -877,7 +878,7 @@ fun MeasurementCard(
                     if (nonPinnedValues.isNotEmpty() && pinnedValues.isEmpty()) {
                         IconButton(
                             onClick  = { isExpanded = !isExpanded },
-                            modifier = Modifier.size(iconButtonSize),
+                            modifier = controlTag("IconButton.action_show_less_desc").then(Modifier.size(iconButtonSize)),
                         ) {
                             Icon(
                                 imageVector        = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
@@ -947,7 +948,7 @@ fun MeasurementCard(
                 }
                 TextButton(
                     onClick   = { isExpanded = !isExpanded },
-                    modifier  = Modifier.fillMaxWidth().height(48.dp),
+                    modifier  = controlTag("Button.action_show_less_desc").then(Modifier.fillMaxWidth().height(48.dp)),
                     shape     = MaterialTheme.shapes.extraSmall,
                 ) {
                     Icon(
@@ -1215,7 +1216,7 @@ fun MeasurementRowExpandable(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(enabled = canExpand) {
+                .then(controlTag("Tap.eval_no_age_band")).clickable(enabled = canExpand) {
                     val cur = expandedTypeIds[type.id] ?: false
                     expandedTypeIds[type.id] = !cur
                 },
@@ -1304,7 +1305,7 @@ fun NoUserSelectedCard(navController: NavController) {
                 Icon(imageVector = Icons.Filled.PersonSearch, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
                 Text(text = stringResource(R.string.no_user_selected_title), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
                 Text(text = stringResource(R.string.no_user_selected_message), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(onClick = { navController.navigate(Routes.userDetail(-1)) }, modifier = Modifier.fillMaxWidth(0.8f)) {
+                Button(onClick = { navController.navigate(Routes.userDetail(-1)) }, modifier = controlTag("Button.action_add_user").then(Modifier.fillMaxWidth(0.8f))) {
                     Icon(Icons.Filled.PersonAdd, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                     Text(stringResource(R.string.action_add_user))
@@ -1331,7 +1332,7 @@ fun NoMeasurementsCard(navController: NavController, selectedUserId: Int?) {
                 Text(text = stringResource(R.string.no_measurements_message), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 FilledTonalButton(
                     onClick  = { if (selectedUserId != null) navController.navigate(Routes.measurementDetail(measurementId = null, userId = selectedUserId)) },
-                    modifier = Modifier.fillMaxWidth(0.8f),
+                    modifier = controlTag("Button.action_add_measurement").then(Modifier.fillMaxWidth(0.8f)),
                     enabled  = selectedUserId != null,
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug build only: mqa QA seeds. Release, beta and oss merge none of this. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Sent with am broadcast, action com.health.openscale.QA_SEED, string extra "scenario".
+             DUMP is held by the adb shell and cannot be granted to other apps. -->
+        <receiver
+            android:name="com.health.openscale.qa.QaSeedReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="com.health.openscale.QA_SEED" />
+            </intent-filter>
+        </receiver>
+        <!-- The same seed for tools that can only start an activity (am start, wait, component):
+             loads the scenario, then opens the app. -->
+        <activity
+            android:name="com.health.openscale.qa.QaSeedActivity"
+            android:exported="true"
+            android:permission="android.permission.DUMP"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    </application>
+</manifest>

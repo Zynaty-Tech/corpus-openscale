@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.overview
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.net.Uri
 import android.view.WindowManager
 import android.widget.Toast
@@ -461,7 +463,7 @@ fun MeasurementDetailScreen(
             LazyVerticalGrid(
                 columns               = GridCells.Adaptive(minSize = 360.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement   = Arrangement.spacedBy(if (useTiles) 12.dp else 0.dp),
+                verticalArrangement   = Arrangement.spacedBy(if (useTiles) 12.dp else 0.dp), modifier = controlTag("Grid"),
             ) {
                 val activeMeasurementTypes = allMeasurementTypes.filter { it.isEnabled }
 
@@ -812,7 +814,7 @@ fun MeasurementValueEditRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(onClick = onEditClick, enabled = !type.isDerived) // Clicking row triggers edit, disabled for derived
+            .then(controlTag("Tap")).clickable(onClick = onEditClick, enabled = !type.isDerived) // Clicking row triggers edit, disabled for derived
     ) {
         RoundMeasurementIcon(
             icon = type.icon.resource,
@@ -848,10 +850,10 @@ fun MeasurementValueEditRow(
         }
         if (showIncrementDecrement && onIncrement != null && onDecrement != null && !type.isDerived) {
             Column { // Layout for increment/decrement buttons
-                IconButton(onClick = onIncrement, modifier = Modifier.size(24.dp)) {
+                IconButton(onClick = onIncrement, modifier = controlTag("IconButton.content_desc_increase_value").then(Modifier.size(24.dp))) {
                     Icon(Icons.Default.ArrowUpward, contentDescription = stringResource(R.string.content_desc_increase_value, type.getDisplayName(context)))
                 }
-                IconButton(onClick = onDecrement, modifier = Modifier.size(24.dp)) {
+                IconButton(onClick = onDecrement, modifier = controlTag("IconButton.content_desc_decrease_value").then(Modifier.size(24.dp))) {
                     Icon(Icons.Default.ArrowDownward, contentDescription = stringResource(R.string.content_desc_decrease_value, type.getDisplayName(context)))
                 }
             }
@@ -860,7 +862,7 @@ fun MeasurementValueEditRow(
 
         // Show edit button only if the type is not derived.
         if (!type.isDerived) {
-            IconButton(onClick = onEditClick, modifier = Modifier.size(36.dp)) {
+            IconButton(onClick = onEditClick, modifier = controlTag("IconButton.content_desc_edit_value").then(Modifier.size(36.dp))) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.content_desc_edit_value, type.getDisplayName(context)))
             }
         }
@@ -876,19 +878,19 @@ private fun ImageSourceSheet(
     onPickFromGallery: () -> Unit,
     onRemove: () -> Unit,
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss, modifier = overlayRoot("ImageSourceSheet")) {
         val itemColors = ListItemDefaults.colors(containerColor = Color.Transparent)
         ListItem(
             headlineContent = { Text(stringResource(R.string.image_take_photo)) },
             leadingContent = { Icon(Icons.Default.PhotoCamera, contentDescription = null) },
             colors = itemColors,
-            modifier = Modifier.clickable(onClick = onTakePhoto)
+            modifier = Modifier.then(controlTag("Tap.image_choose_from_gallery")).clickable(onClick = onTakePhoto)
         )
         ListItem(
             headlineContent = { Text(stringResource(R.string.image_choose_from_gallery)) },
             leadingContent = { Icon(Icons.Default.PhotoLibrary, contentDescription = null) },
             colors = itemColors,
-            modifier = Modifier.clickable(onClick = onPickFromGallery)
+            modifier = Modifier.then(controlTag("Tap.image_remove_photo")).clickable(onClick = onPickFromGallery)
         )
         if (hasImage) {
             ListItem(
@@ -899,7 +901,7 @@ private fun ImageSourceSheet(
                     headlineColor = MaterialTheme.colorScheme.error,
                     leadingIconColor = MaterialTheme.colorScheme.error,
                 ),
-                modifier = Modifier.clickable(onClick = onRemove)
+                modifier = Modifier.then(controlTag("Tap_2")).clickable(onClick = onRemove)
             )
         }
         Spacer(Modifier.padding(bottom = 16.dp))

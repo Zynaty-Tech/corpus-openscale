@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,7 +64,9 @@ fun TimeInputDialog(
     measurementIcon: MeasurementTypeIcon,
     iconBackgroundColor: Color,
     onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit
+    onConfirm: (Long) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     val context = LocalContext.current
     val calendar = remember { Calendar.getInstance().apply { timeInMillis = initialTimestamp } }
@@ -82,6 +86,7 @@ fun TimeInputDialog(
     var showTimePicker by remember { mutableStateOf(true) }
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "TimeInputDialog"),
         onDismissRequest = onDismiss,
         confirmButton = {
             Row(
@@ -89,14 +94,14 @@ fun TimeInputDialog(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { showTimePicker = !showTimePicker }) {
+                IconButton(onClick = { showTimePicker = !showTimePicker }, modifier = controlTag("IconButton.content_desc_change_interval_icon")) {
                     Icon(
                         imageVector = if (showTimePicker) Icons.Default.Edit else Icons.Default.Schedule,
                         contentDescription = stringResource(R.string.content_desc_change_interval_icon)
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(R.string.cancel_button))
                 }
                 TextButton(onClick = {
@@ -107,7 +112,7 @@ fun TimeInputDialog(
                     }
                     onConfirm(updatedCal.timeInMillis)
                     onDismiss()
-                }) {
+                }, modifier = controlTag("Button.dialog_ok")) {
                     Text(stringResource(R.string.dialog_ok))
                 }
             }

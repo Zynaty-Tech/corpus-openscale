@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.graph
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -206,7 +208,7 @@ fun GraphScreen(
                                 Routes.measurementDetail(mwv.measurement.id, uid)
                             )
                         }
-                    },
+                    }, modifier = controlTag("IconButton.action_edit_measurement_desc"),
                 ) {
                     Icon(
                         imageVector        = Icons.Default.Edit,
@@ -215,14 +217,14 @@ fun GraphScreen(
                 }
                 IconButton(
                     enabled = uid != null,
-                    onClick = { showDeleteDialog = true },
+                    onClick = { showDeleteDialog = true }, modifier = controlTag("IconButton.action_delete_measurement_desc"),
                 ) {
                     Icon(
                         imageVector        = Icons.Default.Delete,
                         contentDescription = stringResource(R.string.action_delete_measurement_desc),
                     )
                 }
-                IconButton(onClick = { sheetMeasurementId = null }) {
+                IconButton(onClick = { sheetMeasurementId = null }, modifier = controlTag("IconButton.cancel_button")) {
                     Icon(
                         imageVector        = Icons.Default.Close,
                         contentDescription = stringResource(R.string.cancel_button),
@@ -315,6 +317,7 @@ fun GraphScreen(
         LaunchedEffect(sheetMeasurementId) { sheetState.expand() }
 
         ModalBottomSheet(
+            modifier = overlayRoot("MeasurementSheet"),
             onDismissRequest = { sheetMeasurementId = null },
             sheetState       = sheetState,
             dragHandle       = { BottomSheetDefaults.DragHandle() },

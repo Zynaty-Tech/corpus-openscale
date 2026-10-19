@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.components
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -225,7 +227,7 @@ fun provideFilterTopBarAction(
             // One continuous sheet: the app bar takes the date picker's own container colour so
             // there is no seam between the bar and the picker header below it.
             Surface(
-                modifier = if (fullScreen) {
+                modifier = overlayRoot("DateRangePicker").then(if (fullScreen) {
                     Modifier.fillMaxSize()
                 } else {
                     Modifier
@@ -233,7 +235,7 @@ fun provideFilterTopBarAction(
                         .fillMaxWidth()
                         .heightIn(max = 680.dp)
                         .fillMaxHeight()
-                },
+                }),
                 shape = if (fullScreen) RectangleShape else MaterialTheme.shapes.extraLarge,
                 color = containerColor
             ) {
@@ -250,7 +252,7 @@ fun provideFilterTopBarAction(
                             containerColor = Color.Transparent
                         ),
                         navigationIcon = {
-                            IconButton(onClick = { showDateRangePicker = false }) {
+                            IconButton(onClick = { showDateRangePicker = false }, modifier = controlTag("IconButton.cancel_button")) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = stringResource(R.string.cancel_button)
@@ -262,7 +264,7 @@ fun provideFilterTopBarAction(
                                 TextButton(
                                     onClick = {
                                         dateRangePickerState.setSelection(selectedStart, null)
-                                    }
+                                    }, modifier = controlTag("Button.time_range_custom_clear_end")
                                 ) {
                                     Text(stringResource(R.string.time_range_custom_clear_end))
                                 }
@@ -272,7 +274,7 @@ fun provideFilterTopBarAction(
                                     selectedStart?.let { applyRange(it, selectedEnd) }
                                 },
                                 // A start on its own is a complete choice: "from this day onwards".
-                                enabled = selectedStart != null
+                                enabled = selectedStart != null, modifier = controlTag("Button.dialog_ok")
                             ) { Text(stringResource(R.string.dialog_ok)) }
                         }
                     )
@@ -358,7 +360,7 @@ fun provideFilterTopBarAction(
                                 sharedViewModel.saveSetting(targetTimeRangeKeyName, timeRange.name)
                             }
                         }
-                    }
+                    }, modifier = controlTag("MenuItem.content_description_time_range_selected")
                 )
             }
 
@@ -395,7 +397,7 @@ fun provideFilterTopBarAction(
                             scope.launch {
                                 sharedViewModel.saveAggregationLevel(screenContextName, level)
                             }
-                        }
+                        }, modifier = controlTag("MenuItem.content_description_aggregation_selected")
                     )
                 }
             }
@@ -432,7 +434,7 @@ fun provideFilterTopBarAction(
                             )
                         }
                         showMenuState = false
-                    }
+                    }, modifier = controlTag("MenuItem.menu_item_measurement_filter")
                 )
             }
         }
@@ -473,7 +475,7 @@ private fun FilterSectionHeader(
             tooltip = { PlainTooltip { Text(description) } },
             state = rememberTooltipState()
         ) {
-            IconToggleButton(checked = linked, onCheckedChange = onLinkedChange) {
+            IconToggleButton(checked = linked, onCheckedChange = onLinkedChange, modifier = controlTag("IconToggleButton.Link")) {
                 Icon(
                     imageVector = if (linked) Icons.Default.Link else Icons.Default.LinkOff,
                     contentDescription = description,

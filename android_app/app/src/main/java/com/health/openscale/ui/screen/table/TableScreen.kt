@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.table
 
+import com.health.openscale.ui.qa.controlTag
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -907,7 +908,7 @@ fun TableScreen(
                 }
                 HorizontalDivider()
 
-                LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyListState) {
+                LazyColumn(modifier = controlTag("List").then(Modifier.fillMaxSize()), state = lazyListState) {
                     items(tableData, key = { "${it.measurementId}_${it.timestamp}" }) { rowData ->
                         val key         = rowKey(rowData)
                         val isSelected  = selectedKeys.contains(key)
@@ -928,7 +929,7 @@ fun TableScreen(
                                             MaterialTheme.colorScheme.surface
                                     }
                                 )
-                                .clickable {
+                                .then(controlTag("Tap")).clickable {
                                     if (isInSelectionMode) {
                                         toggleKey(key)
                                     } else if (rowData.isAggregated) {
@@ -955,7 +956,7 @@ fun TableScreen(
                                 ) {
                                     Checkbox(
                                         checked         = isSelected,
-                                        onCheckedChange = { toggleKey(key) },
+                                        onCheckedChange = { toggleKey(key) }, modifier = controlTag("Checkbox"),
                                     )
                                 }
                             }

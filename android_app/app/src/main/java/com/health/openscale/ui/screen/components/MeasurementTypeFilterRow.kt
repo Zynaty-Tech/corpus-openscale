@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.components
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -204,7 +205,7 @@ fun MeasurementTypeFilterRow(
                 size = iconSize,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable(
+                    .then(controlTag("Tap")).clickable(
                         enabled = isInitialized,
                         onClick = {
                             val currentSelectionMutable = displayedSelectedIds.toMutableList()

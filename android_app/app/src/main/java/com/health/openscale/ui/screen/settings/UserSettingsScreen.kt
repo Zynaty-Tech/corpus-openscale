@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -105,8 +106,8 @@ fun UserSettingsScreen(
     }
 
     LazyColumn(
-        modifier = Modifier
-            .padding(16.dp)
+        modifier = controlTag("List").then(Modifier
+            .padding(16.dp))
     ) {
         items(users) { user ->
             // Calculate age. This will be recalculated if user.birthDate changes.
@@ -136,7 +137,7 @@ fun UserSettingsScreen(
                 ,
                 trailingContent = {
                     Row {
-                        IconButton(onClick = { onEditUser(user.id) }) {
+                        IconButton(onClick = { onEditUser(user.id) }, modifier = controlTag("IconButton.Edit")) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = editActionContentDescription // "Edit"
@@ -145,7 +146,7 @@ fun UserSettingsScreen(
                         IconButton(
                             onClick = {
                                 userToDelete = user
-                            }
+                            }, modifier = controlTag("IconButton.Delete")
                         ) {
                             Icon(
                                 Icons.Default.Delete,

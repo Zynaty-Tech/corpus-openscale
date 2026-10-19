@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "screens": [
+    {"tag": "Overview", "roles": ["user"], "openedBy": "Overview", "note": "start destination; shows the No User Active card when no user exists", "scroll": {"depth": 10, "expects": ["text", "button"]}},
+    {"tag": "OverviewDrillDown", "roles": ["user"], "needs": "measurements and an aggregation level (Filter chart data > Week/Month) on Overview", "note": "opened by a period row of the aggregated Overview list"},
+    {"tag": "Graph", "roles": ["user"], "openedBy": "Charts", "needs": "measurements of the selected user"},
+    {"tag": "Table", "roles": ["user"], "openedBy": "Table", "needs": "measurements of the selected user", "scroll": {"depth": 10, "expects": ["text"]}},
+    {"tag": "TableDrillDown", "roles": ["user"], "needs": "measurements and an aggregation level (Filter chart data > Week/Month) on Table", "note": "opened by a period row of the aggregated table"},
+    {"tag": "MeasurementComparison", "roles": ["user"], "openedBy": "Compare the two selected measurements", "needs": "two measurements selected in the Table (top bar Select items, then tap two rows)"},
+    {"tag": "Statistics", "roles": ["user"], "openedBy": "Statistics", "needs": "measurements of the selected user"},
+    {"tag": "Insights", "roles": ["user"], "openedBy": "Insights", "needs": "measurements of the selected user; anomaly rows need many measurements"},
+    {"tag": "Settings", "roles": ["user"], "openedBy": "Settings"},
+    {"tag": "GeneralSettings", "roles": ["user"], "openedBy": "General"},
+    {"tag": "UserSettings", "roles": ["user"], "openedBy": "User"},
+    {"tag": "MeasurementTypeSettings", "roles": ["user"], "openedBy": "Measurement Types"},
+    {"tag": "BluetoothSettings", "roles": ["user"], "openedBy": "Bluetooth", "note": "scanning for a scale needs Bluetooth hardware and a real scale"},
+    {"tag": "ChartSettings", "roles": ["user"], "openedBy": "Chart"},
+    {"tag": "DataManagementSettings", "roles": ["user"], "openedBy": "Data Management"},
+    {"tag": "AboutSettings", "roles": ["user"], "openedBy": "About"},
+    {"tag": "UserDetail", "roles": ["user"], "openedBy": "Add User", "note": "also opened by a user row in Users (Edit User)"},
+    {"tag": "MeasurementDetail", "roles": ["user"], "openedBy": "Add new measurement", "needs": "a selected user", "note": "also opened by a measurement row (Edit Measurement)"},
+    {"tag": "MeasurementTypeDetail", "roles": ["user"], "openedBy": "Edit", "note": "opened by a type row or the add action in Measurement Types"},
+    {"tag": "BluetoothDetail", "roles": ["user"], "openedBy": "Edit", "needs": "a saved Bluetooth scale (pairing needs a real scale)"},
+    {"tag": "WidgetConfig", "roles": ["user"], "hidden": true, "note": "own activity, opened by the launcher when a home-screen widget is added; not reachable from inside the app"}
+  ],
+  "seeds": {
+    "users-measurements": {"broadcast": "com.health.openscale.QA_SEED", "extras": {"scenario": "users-measurements"}},
+    "empty": {"broadcast": "com.health.openscale.QA_SEED", "extras": {"scenario": "empty"}}
+  }
+}

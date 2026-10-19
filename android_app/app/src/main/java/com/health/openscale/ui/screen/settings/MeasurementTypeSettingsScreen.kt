@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -236,6 +238,7 @@ fun MeasurementTypeSettingsScreen(
 
     if (pendingAction != null) {
         AlertDialog(
+            modifier = overlayRoot("ConfirmActionDialog"),
             onDismissRequest = { pendingAction = null },
             title = { Text(dialogTitle) },
             text = { Text(dialogText) },
@@ -244,13 +247,13 @@ fun MeasurementTypeSettingsScreen(
                     onClick = {
                         pendingAction?.invoke()
                         pendingAction = null
-                    }
+                    }, modifier = controlTag("Button.confirm_button")
                 ) {
                     Text(stringResource(R.string.confirm_button))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { pendingAction = null }) {
+                TextButton(onClick = { pendingAction = null }, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(R.string.cancel_button))
                 }
             }
@@ -272,9 +275,9 @@ fun MeasurementTypeSettingsScreen(
 
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier
+        modifier = controlTag("List").then(Modifier
             .padding(16.dp)
-            .fillMaxSize()
+            .fillMaxSize())
     ) {
         itemsIndexed(list, key = { _, item -> item.id }) { _, type ->
             ReorderableItem(reorderableState, key = type.id) { isDragging ->
@@ -298,7 +301,7 @@ fun MeasurementTypeSettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .graphicsLayer(alpha = itemAlpha) // Apply transparency for disabled items
-                        .combinedClickable(
+                        .then(controlTag("Tap")).combinedClickable(
                             onClick = {
                                 if (isInSelectionMode) {
                                     if (isSelected) selectedTypeIds.remove(type.id) else selectedTypeIds.add(
@@ -330,7 +333,7 @@ fun MeasurementTypeSettingsScreen(
                                     if (isSelected) selectedTypeIds.remove(type.id) else selectedTypeIds.add(type.id)
                                     if (selectedTypeIds.isEmpty()) isInSelectionMode = false
                                 },
-                                modifier = Modifier.padding(end = 8.dp)
+                                modifier = controlTag("Checkbox").then(Modifier.padding(end = 8.dp))
                             )
                         }
 
@@ -401,7 +404,7 @@ fun MeasurementTypeSettingsScreen(
                         Spacer(Modifier.size(8.dp))
 
                         // Edit button
-                        IconButton(onClick = { onEditType(type.id) }) {
+                        IconButton(onClick = { onEditType(type.id) }, modifier = controlTag("IconButton.Edit")) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = editContentDesc
@@ -410,7 +413,7 @@ fun MeasurementTypeSettingsScreen(
 
                         // Delete button is only shown for custom types
                         if (!type.isBuiltIn()) {
-                            IconButton(onClick = { typeToDelete = type }) {
+                            IconButton(onClick = { typeToDelete = type }, modifier = controlTag("IconButton.Delete")) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = deleteContentDesc,
@@ -421,9 +424,9 @@ fun MeasurementTypeSettingsScreen(
 
                         // Drag handle for reordering
                         IconButton(
-                            modifier = Modifier
+                            modifier = controlTag("IconButton.DragHandle").then(Modifier
                                 .draggableHandle()
-                                .padding(start = 8.dp),
+                                .padding(start = 8.dp)),
                             onClick = {}
                         ) {
                             Icon(

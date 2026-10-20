@@ -54,6 +54,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import com.health.openscale.ui.qa.controlTag
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -120,6 +122,9 @@ internal data class ChartSeries(
  * @param targetMeasurementTypeId If non-null, only this type is shown. Hides the type filter row.
  * @param showTypeFilterRow      If false, the caller places [MeasurementChartTypeFilterRow] itself.
  * @param onPointSelected        Callback invoked with the timestamp when a data point is selected.
+ * @param onChartClick           The chart's click action for accessibility services, which cannot
+ *                               tap a point on the canvas (null: the chart publishes none).
+ * @param onChartClickLabel      The label of that action.
  */
 @Composable
 fun MeasurementChart(
@@ -133,6 +138,8 @@ fun MeasurementChart(
     targetMeasurementTypeId: Int? = null,
     showTypeFilterRow: Boolean = true,
     onPointSelected: (timestamp: Long) -> Unit = {},
+    onChartClick: (() -> Unit)? = null,
+    onChartClickLabel: String? = null,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -525,7 +532,12 @@ fun MeasurementChart(
                     modelProducer = modelProducer,
                     modifier      = Modifier
                         .fillMaxWidth()
-                        .weight(if (showPeriodChart) 1f - localSplitterWeight else 1f),
+                        .weight(if (showPeriodChart) 1f - localSplitterWeight else 1f)
+                        .then(
+                            if (onChartClick != null) controlTag("Tap.ChartPoint").semantics {
+                                onClick(label = onChartClickLabel) { onChartClick(); true }
+                            } else Modifier
+                        ),
                     scrollState   = scrollState,
                     zoomState     = zoomState,
                 )

@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.navigation
 
+import com.health.openscale.ui.qa.exposeTestTags
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
@@ -592,7 +593,7 @@ fun UserDropdownAsAction(
                 }
             }
         }
-        DropdownMenu(
+        DropdownMenu(modifier = Modifier.exposeTestTags(),
             expanded = expanded,
             onDismissRequest = { expanded = false } // Close dropdown when clicked outside.
         ) {

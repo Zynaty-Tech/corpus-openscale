@@ -17,12 +17,16 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -457,41 +461,53 @@ fun MeasurementTypeDetailScreen(
             )
         }
 
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text(stringResource(R.string.measurement_type_label_color)) },
-            modifier = controlTag("Field.measurement_type_label_color").then(Modifier.fillMaxWidth().then(controlTag("Tap.measurement_type_label_icon")).clickable { showColorPicker = true }),
-            readOnly = true,
-            enabled = false,
-            trailingIcon = {
-                Box(modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(selectedColor)))
-            },
-            colors = TextFieldDefaults.colors(
-                disabledTextColor = LocalContentColor.current,
-                disabledIndicatorColor = MaterialTheme.colorScheme.outline,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledContainerColor = Color.Transparent
+        PickerFieldBox(
+            label = stringResource(R.string.measurement_type_label_color),
+            onClick = { showColorPicker = true },
+            modifier = controlTag("Tap.measurement_type_label_color"),
+        ) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(stringResource(R.string.measurement_type_label_color)) },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false,
+                trailingIcon = {
+                    Box(modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(selectedColor)))
+                },
+                colors = TextFieldDefaults.colors(
+                    disabledTextColor = LocalContentColor.current,
+                    disabledIndicatorColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledContainerColor = Color.Transparent
+                )
             )
-        )
+        }
 
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text(stringResource(R.string.measurement_type_label_icon)) },
-            modifier = controlTag("Field.measurement_type_label_icon").then(Modifier.fillMaxWidth().then(controlTag("Tap.formula_label_body_fat")).clickable { showIconPicker = true }),
-            readOnly = true,
-            enabled = false,
-            trailingIcon = { MeasurementIcon(icon = selectedIcon.resource) },
-            colors = TextFieldDefaults.colors(
-                disabledTextColor = LocalContentColor.current,
-                disabledIndicatorColor = MaterialTheme.colorScheme.outline,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledContainerColor = Color.Transparent
+        PickerFieldBox(
+            label = stringResource(R.string.measurement_type_label_icon),
+            onClick = { showIconPicker = true },
+            modifier = controlTag("Tap.measurement_type_label_icon"),
+        ) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(stringResource(R.string.measurement_type_label_icon)) },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                enabled = false,
+                trailingIcon = { MeasurementIcon(icon = selectedIcon.resource) },
+                colors = TextFieldDefaults.colors(
+                    disabledTextColor = LocalContentColor.current,
+                    disabledIndicatorColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledContainerColor = Color.Transparent
+                )
             )
-        )
+        }
 
         // Formula pickers use local state
         when (editedKey) {
@@ -565,7 +581,7 @@ fun MeasurementTypeDetailScreen(
                 ExposedDropdownMenu(
                     expanded = expandedUnit,
                     onDismissRequest = { expandedUnit = false },
-                    modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true)
+                    modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true).exposeTestTags()
                 ) {
                     allowedUnitsForKey.forEach { unit ->
                         DropdownMenuItem(
@@ -588,7 +604,7 @@ fun MeasurementTypeDetailScreen(
                                 } else {
                                     selectedUnit = unit
                                 }
-                            }, modifier = controlTag("MenuItem")
+                            }, modifier = controlTag("Option.${unit.name}")
                         )
                     }
                 }
@@ -605,7 +621,7 @@ fun MeasurementTypeDetailScreen(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInputType) },
                     modifier = controlTag("Field.measurement_type_label_input_type").then(Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth())
                 )
-                ExposedDropdownMenu(expanded = expandedInputType, onDismissRequest = { expandedInputType = false }) {
+                ExposedDropdownMenu(modifier = Modifier.exposeTestTags(), expanded = expandedInputType, onDismissRequest = { expandedInputType = false }) {
                     allowedInputTypesForKey.forEach { type ->
                         DropdownMenuItem(
                             text = { Text(type.name.lowercase().replaceFirstChar { it.uppercase() }) },
@@ -615,7 +631,7 @@ fun MeasurementTypeDetailScreen(
                                 if (type == InputFieldType.IMAGE && selectedIcon == MeasurementTypeIcon.IC_DEFAULT) {
                                     selectedIcon = MeasurementTypeIcon.IC_PHOTO
                                 }
-                            }, modifier = controlTag("MenuItem_2")
+                            }, modifier = controlTag("Option.${type.name}")
                         )
                     }
                 }
@@ -772,6 +788,8 @@ private fun <T> FormulaPickerRow(
     optionLabel: (T) -> String,
     optionSubtitle: ((T) -> String)? = null,
     onInfo: ((T) -> Unit)? = null,
+    // A stable, untranslated key per option (the enum name): the option's control id.
+    optionKey: (T) -> String = { (it as? Enum<*>)?.name ?: it.toString() },
     onSelect: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -785,7 +803,7 @@ private fun <T> FormulaPickerRow(
             label = label,
             surfaceModifier = Modifier
                 .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
-                .then(controlTag("Tap_2")).clickable { expanded = true },
+                .then(controlTag("Tap.formula")).clickable { expanded = true },
             controlContent = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -806,7 +824,7 @@ private fun <T> FormulaPickerRow(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true)
+            modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true).exposeTestTags()
         ) {
             options.forEach { opt ->
                 DropdownMenuItem(
@@ -835,10 +853,10 @@ private fun <T> FormulaPickerRow(
                         {
                             Icon(
                                 imageVector = Icons.Outlined.Info,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.content_desc_information),
                                 modifier = Modifier
                                     .size(18.dp)
-                                    .then(controlTag("Tap_3")).clickable { onInfo(opt) },
+                                    .then(controlTag("Option.${optionKey(opt)}.Info")).clickable(role = Role.Button) { onInfo(opt) },
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -846,9 +864,33 @@ private fun <T> FormulaPickerRow(
                     onClick = {
                         expanded = false
                         onSelect(opt)
-                    }, modifier = controlTag("MenuItem.Info")
+                    }, modifier = controlTag("Option.${optionKey(opt)}")
                 )
             }
         }
+    }
+}
+
+/**
+ * A read-only field that opens a picker. A disabled text field publishes no click action, so a
+ * clickable overlay on top of it is the tap target: it carries the control id, a button role and
+ * the field's label.
+ */
+@Composable
+private fun PickerFieldBox(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    field: @Composable () -> Unit,
+) {
+    Box(Modifier.fillMaxWidth()) {
+        field()
+        Box(
+            Modifier
+                .matchParentSize()
+                .then(modifier)
+                .clickable(role = Role.Button, onClick = onClick)
+                .semantics { contentDescription = label }
+        )
     }
 }

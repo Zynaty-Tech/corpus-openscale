@@ -295,6 +295,13 @@ fun GraphScreen(
                                     lastTapAt = now
                                 }
                             },
+                            // A point opens on a double tap of the canvas; accessibility services
+                            // get one click action that opens the newest measurement instead.
+                            onChartClick      = {
+                                allMeasurementsWithValues.maxByOrNull { it.measurement.timestamp }
+                                    ?.let { sheetMeasurementId = it.measurement.id }
+                            },
+                            onChartClickLabel = stringResource(R.string.route_title_table_drilldown),
                         )
                     }
                 }

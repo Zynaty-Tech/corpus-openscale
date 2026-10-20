@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.Manifest
@@ -724,7 +725,7 @@ fun DeviceCardItem(
                             contentDescription = stringResource(R.string.more_options_cd)
                         )
                     }
-                    DropdownMenu(
+                    DropdownMenu(modifier = Modifier.exposeTestTags(),
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
@@ -734,7 +735,7 @@ fun DeviceCardItem(
                                 onClick = {
                                     showMenu = false
                                     onSavePreferred()
-                                }, modifier = controlTag("MenuItem.menu_save_as_preferred")
+                                }, modifier = controlTag("Option.menu_save_as_preferred")
                             )
                         }
                         DropdownMenuItem(
@@ -742,7 +743,7 @@ fun DeviceCardItem(
                             onClick = {
                                 showMenu = false
                                 onSaveDebug()
-                            }, modifier = controlTag("MenuItem.menu_save_as_developer")
+                            }, modifier = controlTag("Option.menu_save_as_developer")
                         )
                     }
                 }

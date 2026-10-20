@@ -203,6 +203,8 @@ fun MeasurementTypeFilterRow(
                 backgroundTint = iconBackgroundColor,
                 iconTint = iconColor,
                 size = iconSize,
+                // The chip is icon-only: the type's name is its label.
+                contentDescription = type.getDisplayName(LocalContext.current),
                 modifier = Modifier
                     .clip(CircleShape)
                     .then(controlTag("Tap")).clickable(

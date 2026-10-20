@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -178,7 +179,7 @@ fun BluetoothDetailScreen(
             ExposedDropdownMenu(
                 expanded = tuningDropdownExpanded,
                 onDismissRequest = { tuningDropdownExpanded = false },
-                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true)
+                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true).exposeTestTags()
             ) {
                 availableTuningProfiles.forEach { profile ->
                     DropdownMenuItem(
@@ -187,7 +188,7 @@ fun BluetoothDetailScreen(
                         onClick = {
                             scope.launch { bluetoothViewModel.setSavedTuning(profile) }
                             tuningDropdownExpanded = false
-                        }, modifier = controlTag("MenuItem")
+                        }, modifier = controlTag("Option.${profile.name}")
                     )
                 }
             }

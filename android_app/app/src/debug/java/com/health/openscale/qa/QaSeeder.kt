@@ -18,6 +18,10 @@
 package com.health.openscale.qa
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import com.health.openscale.core.data.ActivityLevel
 import com.health.openscale.core.data.GenderType
 import com.health.openscale.core.data.InputFieldType
@@ -28,6 +32,7 @@ import com.health.openscale.core.data.User
 import com.health.openscale.core.data.UserGoals
 import com.health.openscale.core.facade.MeasurementFacade
 import com.health.openscale.core.facade.UserFacade
+import com.health.openscale.core.usecase.MeasurementCrudUseCases
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -40,6 +45,10 @@ import kotlin.math.sin
  * Debug-only QA seeds (mqa skill `qa-seeds`). Every scenario first removes all users (their
  * measurements and goals go with them through the foreign keys), then writes fixed data:
  * fixed names, fixed dates, fixed values. Loading a scenario twice gives the same state.
+ *
+ * Kinds of data in users-measurements: two users (one selected), a weight goal, daily FLOAT
+ * values, and on Alex's newest measurement a comment (TEXT) and a photo (IMAGE, a bitmap
+ * drawn here and stored under a fixed file name); the other measurements have neither.
  */
 object QaSeeder {
 
@@ -93,7 +102,15 @@ object QaSeeder {
                 ).getOrThrow().toInt()
 
                 val writable = types.filter { it.isEnabled && !it.isDerived && it.inputType == InputFieldType.FLOAT }
-                writeSeries(measurements, alexId, writable, count = 40, baseWeight = 84f, slope = -0.12f)
+                val newestExtras = buildList {
+                    types.firstOrNull { it.key == MeasurementType.COMMENT && it.isEnabled }?.let {
+                        add(MeasurementValue(measurementId = 0, typeId = it.id, textValue = "QA seed: morning, after a run"))
+                    }
+                    types.firstOrNull { it.key == MeasurementType.PHOTO && it.isEnabled }?.let {
+                        add(MeasurementValue(measurementId = 0, typeId = it.id, textValue = writeSeedPhoto(context)))
+                    }
+                }
+                writeSeries(measurements, alexId, writable, count = 40, baseWeight = 84f, slope = -0.12f, newestExtras = newestExtras)
                 writeSeries(measurements, samId, writable, count = 6, baseWeight = 61f, slope = 0.02f)
 
                 types.firstOrNull { it.key == MeasurementType.WEIGHT }?.let { weight ->
@@ -111,6 +128,24 @@ object QaSeeder {
                 "seeded users-measurements"
             }
         }
+    }
+
+    /** Fixed name in the app's image folder; the name matches the app's UUID file-name rule. */
+    private const val SEED_PHOTO = "00000000-0000-4000-8000-000000000001.jpg"
+
+    /** Draws a fixed 240x240 picture (no download, no random data) and stores it; returns its file name. */
+    private fun writeSeedPhoto(context: Context): String {
+        val file = MeasurementCrudUseCases.imageFile(context, SEED_PHOTO)
+            ?: error("seed photo name rejected by the app")
+        file.parentFile?.mkdirs()
+        val bitmap = Bitmap.createBitmap(240, 240, Bitmap.Config.ARGB_8888)
+        Canvas(bitmap).apply {
+            drawColor(Color.rgb(212, 225, 87))
+            drawCircle(120f, 120f, 80f, Paint().apply { color = Color.rgb(33, 150, 243); isAntiAlias = false })
+        }
+        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+        bitmap.recycle()
+        return SEED_PHOTO
     }
 
     /** Default types are written on first start, in the background; wait for them (max 10 s). */
@@ -131,6 +166,7 @@ object QaSeeder {
         count: Int,
         baseWeight: Float,
         slope: Float,
+        newestExtras: List<MeasurementValue> = emptyList(),
     ) {
         for (day in count - 1 downTo 0) {
             val age = (count - 1 - day).toFloat() // 0 = oldest
@@ -150,7 +186,7 @@ object QaSeeder {
             }
             measurements.saveMeasurement(
                 Measurement(userId = userId, timestamp = ANCHOR_MILLIS - day * DAY_MILLIS),
-                values,
+                if (day == 0) values + newestExtras else values,
             )
         }
     }

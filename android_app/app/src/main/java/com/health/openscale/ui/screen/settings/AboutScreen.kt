@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.R.attr.contentDescription
@@ -207,11 +208,11 @@ fun AboutScreen(
                     modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).then(controlTag("Tap")).clickable { scenarioExpanded = true },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
-                ExposedDropdownMenu(expanded = scenarioExpanded, onDismissRequest = { scenarioExpanded = false }) {
+                ExposedDropdownMenu(modifier = Modifier.exposeTestTags(), expanded = scenarioExpanded, onDismissRequest = { scenarioExpanded = false }) {
                     MeasurementDemoUseCase.DemoScenario.entries.forEach { scenario ->
                         DropdownMenuItem(
                             text = { Text(scenario.getDisplayName(context), color = MaterialTheme.colorScheme.error) },
-                            onClick = { selectedScenario = scenario; scenarioExpanded = false }, modifier = controlTag("MenuItem")
+                            onClick = { selectedScenario = scenario; scenarioExpanded = false }, modifier = controlTag("Option.${scenario.name}")
                         )
                     }
                 }
@@ -232,11 +233,11 @@ fun AboutScreen(
                     modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).then(controlTag("Tap.dev_tools_wipe_data_label")).clickable { rangeExpanded = true },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                 )
-                ExposedDropdownMenu(expanded = rangeExpanded, onDismissRequest = { rangeExpanded = false }) {
+                ExposedDropdownMenu(modifier = Modifier.exposeTestTags(), expanded = rangeExpanded, onDismissRequest = { rangeExpanded = false }) {
                     MeasurementDemoUseCase.TimeRange.entries.forEach { range ->
                         DropdownMenuItem(
                             text = { Text(range.getDisplayName(context), color = MaterialTheme.colorScheme.error) },
-                            onClick = { selectedRange = range; rangeExpanded = false }, modifier = controlTag("MenuItem_2")
+                            onClick = { selectedRange = range; rangeExpanded = false }, modifier = controlTag("Option.${range.name}")
                         )
                     }
                 }

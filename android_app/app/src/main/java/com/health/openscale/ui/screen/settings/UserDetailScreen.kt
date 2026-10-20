@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
@@ -399,7 +400,7 @@ fun UserDetailScreen(
                     .fillMaxWidth())
             )
 
-            ExposedDropdownMenu(
+            ExposedDropdownMenu(modifier = Modifier.exposeTestTags(),
                 expanded = genderExpanded,
                 onDismissRequest = { genderExpanded = false }
             ) {
@@ -410,7 +411,7 @@ fun UserDetailScreen(
                             gender = selectionOption
                             genderExpanded = false
                         },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("MenuItem"),
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("Option.${selectionOption.name}"),
                     )
                 }
             }
@@ -434,7 +435,7 @@ fun UserDetailScreen(
                     .fillMaxWidth())
             )
 
-            ExposedDropdownMenu(
+            ExposedDropdownMenu(modifier = Modifier.exposeTestTags(),
                 expanded = activityLevelExpanded,
                 onDismissRequest = { activityLevelExpanded = false }
             ) {
@@ -445,7 +446,7 @@ fun UserDetailScreen(
                             activityLevel = selectionOption
                             activityLevelExpanded = false
                         },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("MenuItem_2"),
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("Option.${selectionOption.name}"),
                     )
                 }
             }

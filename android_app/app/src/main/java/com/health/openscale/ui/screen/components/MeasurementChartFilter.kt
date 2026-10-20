@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.components
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.background
@@ -323,7 +324,7 @@ fun provideFilterTopBarAction(
         contentDescription = stringResource(R.string.content_description_filter_chart_data),
         onClick = { showMenuState = !showMenuState }
     ) {
-        DropdownMenu(expanded = showMenuState, onDismissRequest = { showMenuState = false }) {
+        DropdownMenu(modifier = Modifier.exposeTestTags(), expanded = showMenuState, onDismissRequest = { showMenuState = false }) {
 
             // --- Section 1: Time range ---
             FilterSectionHeader(
@@ -360,7 +361,7 @@ fun provideFilterTopBarAction(
                                 sharedViewModel.saveSetting(targetTimeRangeKeyName, timeRange.name)
                             }
                         }
-                    }, modifier = controlTag("MenuItem.content_description_time_range_selected")
+                    }, modifier = controlTag("Option.${timeRange.name}")
                 )
             }
 
@@ -397,7 +398,7 @@ fun provideFilterTopBarAction(
                             scope.launch {
                                 sharedViewModel.saveAggregationLevel(screenContextName, level)
                             }
-                        }, modifier = controlTag("MenuItem.content_description_aggregation_selected")
+                        }, modifier = controlTag("Option.${level.name}")
                     )
                 }
             }
@@ -434,7 +435,7 @@ fun provideFilterTopBarAction(
                             )
                         }
                         showMenuState = false
-                    }, modifier = controlTag("MenuItem.menu_item_measurement_filter")
+                    }, modifier = controlTag("Option.menu_item_measurement_filter")
                 )
             }
         }

@@ -21,10 +21,15 @@ import com.health.openscale.ui.navigation.Routes
 import com.health.openscale.ui.qa.screenNameOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/** The mqa screen map (debug asset) lists exactly the screens the code tags. */
+/**
+ * The mqa screen map (debug asset) lists exactly the destinations the code tags, and every
+ * overlay entry (`<Host>.<Kind>`, or `<Kind>` for an app-wide overlay) names a host screen and
+ * an overlay kind that the code tags.
+ */
 class ScreenMapTest {
 
     private val uiDir = File("src/main/java/com/health/openscale/ui")
@@ -46,7 +51,19 @@ class ScreenMapTest {
         val literal = uiDir.walk().filter { it.extension == "kt" }
             .flatMap { Regex("""ScreenTagged\("(\w+)"\)""").findAll(it.readText()).map { m -> m.groupValues[1] } }
             .toSet()
-        val inMap = Regex("""\"tag\":\s*\"(\w+)\"""").findAll(map.readText()).map { it.groupValues[1] }.toSet()
-        assertEquals((names + literal).toSortedSet(), inMap.toSortedSet())
+        val sources = uiDir.walk().filter { it.extension == "kt" }.map { it.readText() }.toList()
+        val overlayKinds = sources.flatMap { text ->
+            Regex("""overlayRoot\((?:overlayTag \?: )?"(\w+)"\)|overlayTag = "(\w+)"""").findAll(text)
+                .map { m -> m.groupValues[1].ifEmpty { m.groupValues[2] } }
+        }.toSet() + "Drawer"
+        val inMap = Regex("""\"tag\":\s*\"([\w.]+)\"""").findAll(map.readText()).map { it.groupValues[1] }.toList()
+        assertEquals("a tag is listed twice", inMap.size, inMap.toSet().size)
+        val destinations = inMap.filter { '.' !in it && it !in overlayKinds }
+        assertEquals((names + literal).toSortedSet(), destinations.toSortedSet())
+        inMap.filter { '.' in it }.forEach { tag ->
+            val (host, kind) = tag.split('.', limit = 2)
+            assertTrue("$tag: no screen $host", host in names + literal)
+            assertTrue("$tag: no overlay kind $kind in code", kind in overlayKinds)
+        }
     }
 }

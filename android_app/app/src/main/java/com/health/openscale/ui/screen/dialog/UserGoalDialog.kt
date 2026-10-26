@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
@@ -311,7 +312,7 @@ fun UserGoalDialog(
                             enabled = !isEditing && targetableTypes.isNotEmpty()
                         )
                         if (!isEditing && targetableTypes.isNotEmpty()) {
-                            ExposedDropdownMenu(
+                            ExposedDropdownMenu(modifier = Modifier.exposeTestTags(),
                                 expanded = typeDropdownExpanded,
                                 onDismissRequest = { typeDropdownExpanded = false }
                             ) {

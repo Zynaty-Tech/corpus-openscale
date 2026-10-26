@@ -28,19 +28,22 @@ import com.health.openscale.core.data.MeasurementTypeIcon
  * @param modifier [Modifier] to be applied to the Icon composable.
  * @param size The size of the icon graphic.
  * @param tint The tint color for the icon graphic.
+ * @param contentDescription The label for accessibility; null (the default) marks the icon as
+ *   decorative. Never a resource number: that is read out as digits.
  */
 @Composable
 fun MeasurementIcon(
     icon: IconResource,
     modifier: Modifier = Modifier,
     size: Dp = 24.dp,
-    tint: Color = LocalContentColor.current
+    tint: Color = LocalContentColor.current,
+    contentDescription: String? = null,
 ) {
     when (icon) {
         is IconResource.PainterResource -> {
             Icon(
                 painter = painterResource(id = icon.id),
-                contentDescription = icon.id.toString(),
+                contentDescription = contentDescription,
                 modifier = modifier.size(size),
                 tint = tint
             )
@@ -48,7 +51,7 @@ fun MeasurementIcon(
         is IconResource.VectorResource -> {
             Icon(
                 imageVector = icon.imageVector,
-                contentDescription = icon.imageVector.name,
+                contentDescription = contentDescription,
                 modifier = modifier.size(size),
                 tint = tint
             )
@@ -71,7 +74,8 @@ fun RoundMeasurementIcon(
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
     backgroundTint : Color = MaterialTheme.colorScheme.surfaceVariant,
-    iconTint: Color = Color.Black
+    iconTint: Color = Color.Black,
+    contentDescription: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -84,7 +88,8 @@ fun RoundMeasurementIcon(
         MeasurementIcon(
             icon = icon,
             size = size,
-            tint = iconTint
+            tint = iconTint,
+            contentDescription = contentDescription,
         )
     }
 }

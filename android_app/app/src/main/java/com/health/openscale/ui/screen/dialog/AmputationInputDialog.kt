@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.clickable
@@ -169,7 +170,7 @@ private fun AmputationRow(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = controlTag("Field").then(Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true))
                     )
-                    ExposedDropdownMenu(
+                    ExposedDropdownMenu(modifier = Modifier.exposeTestTags(),
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {

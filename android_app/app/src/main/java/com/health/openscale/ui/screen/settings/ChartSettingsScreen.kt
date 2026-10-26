@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -261,7 +262,7 @@ fun ChartSettingsScreen(
                             ExposedDropdownMenu(
                                 expanded = polyDegreeDropdownExpanded,
                                 onDismissRequest = { polyDegreeDropdownExpanded = false },
-                                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true)
+                                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true).exposeTestTags()
                             ) {
                                 availablePolyDegrees.forEach { degreeEnum ->
                                     DropdownMenuItem(
@@ -271,7 +272,7 @@ fun ChartSettingsScreen(
                                                 sharedViewModel.setChartProjectionPolynomialDegree(degreeEnum.degree)
                                             }
                                             polyDegreeDropdownExpanded = false
-                                        }, modifier = controlTag("MenuItem")
+                                        }, modifier = controlTag("Option.${degreeEnum.name}")
                                     )
                                 }
                             }
@@ -308,7 +309,7 @@ fun ChartSettingsScreen(
             ExposedDropdownMenu(
                 expanded = algorithmDropdownExpanded,
                 onDismissRequest = { algorithmDropdownExpanded = false },
-                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true)
+                modifier = Modifier.exposedDropdownSize(matchAnchorWidth = true).exposeTestTags()
             ) {
                 availableAlgorithms.forEach { algorithm ->
                     DropdownMenuItem(
@@ -318,7 +319,7 @@ fun ChartSettingsScreen(
                                 sharedViewModel.setChartSmoothingAlgorithm(algorithm)
                             }
                             algorithmDropdownExpanded = false
-                        }, modifier = controlTag("MenuItem_2")
+                        }, modifier = controlTag("Option.${algorithm.name}")
                     )
                 }
             }

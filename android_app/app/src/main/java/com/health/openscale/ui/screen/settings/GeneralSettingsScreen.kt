@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.exposeTestTags
 import com.health.openscale.ui.qa.controlTag
 import com.health.openscale.ui.qa.overlayRoot
 import android.Manifest
@@ -328,7 +329,7 @@ fun GeneralSettingsScreen(
                 ExposedDropdownMenu(
                     expanded = expandedLanguageMenu,
                     onDismissRequest = { expandedLanguageMenu = false },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().exposeTestTags()
                 ) {
                     SupportedLanguage.entries.forEach { langEnumEntry ->
                         DropdownMenuItem(
@@ -342,7 +343,7 @@ fun GeneralSettingsScreen(
                                 }
                                 expandedLanguageMenu = false
                             },
-                            modifier = controlTag("MenuItem").then(Modifier.fillMaxWidth())
+                            modifier = controlTag("Option.${langEnumEntry.name}").then(Modifier.fillMaxWidth())
                         )
                     }
                 }
@@ -499,7 +500,7 @@ fun GeneralSettingsScreen(
                     ExposedDropdownMenu(
                         expanded = expandedDays,
                         onDismissRequest = { expandedDays = false },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().exposeTestTags()
                     ) {
                         dayOrder.forEach { (day, label) ->
                             val selected = reminderDays.contains(day.name)

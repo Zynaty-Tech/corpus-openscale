@@ -814,7 +814,9 @@ fun MeasurementValueEditRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .then(controlTag("Tap")).clickable(onClick = onEditClick, enabled = !type.isDerived) // Clicking row triggers edit, disabled for derived
+            // The input type decides the dialog a row opens (number, text, date, time, user, photo), so
+            // the row's id carries it: rows of one input type share an id, rows of different types do not.
+            .then(controlTag("Tap.${type.inputType.name}")).clickable(onClick = onEditClick, enabled = !type.isDerived) // Clicking row triggers edit, disabled for derived
     ) {
         RoundMeasurementIcon(
             icon = type.icon.resource,
@@ -862,7 +864,7 @@ fun MeasurementValueEditRow(
 
         // Show edit button only if the type is not derived.
         if (!type.isDerived) {
-            IconButton(onClick = onEditClick, modifier = controlTag("IconButton.content_desc_edit_value").then(Modifier.size(36.dp))) {
+            IconButton(onClick = onEditClick, modifier = controlTag("Edit.${type.inputType.name}").then(Modifier.size(36.dp))) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.content_desc_edit_value, type.getDisplayName(context)))
             }
         }
@@ -884,13 +886,13 @@ private fun ImageSourceSheet(
             headlineContent = { Text(stringResource(R.string.image_take_photo)) },
             leadingContent = { Icon(Icons.Default.PhotoCamera, contentDescription = null) },
             colors = itemColors,
-            modifier = Modifier.then(controlTag("Tap.image_choose_from_gallery")).clickable(onClick = onTakePhoto)
+            modifier = Modifier.then(controlTag("Tap.image_take_photo")).clickable(onClick = onTakePhoto)
         )
         ListItem(
             headlineContent = { Text(stringResource(R.string.image_choose_from_gallery)) },
             leadingContent = { Icon(Icons.Default.PhotoLibrary, contentDescription = null) },
             colors = itemColors,
-            modifier = Modifier.then(controlTag("Tap.image_remove_photo")).clickable(onClick = onPickFromGallery)
+            modifier = Modifier.then(controlTag("Tap.image_choose_from_gallery")).clickable(onClick = onPickFromGallery)
         )
         if (hasImage) {
             ListItem(
@@ -901,7 +903,7 @@ private fun ImageSourceSheet(
                     headlineColor = MaterialTheme.colorScheme.error,
                     leadingIconColor = MaterialTheme.colorScheme.error,
                 ),
-                modifier = Modifier.then(controlTag("Tap_2")).clickable(onClick = onRemove)
+                modifier = Modifier.then(controlTag("Tap.image_remove_photo")).clickable(onClick = onRemove)
             )
         }
         Spacer(Modifier.padding(bottom = 16.dp))

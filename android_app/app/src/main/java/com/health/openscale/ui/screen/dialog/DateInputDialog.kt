@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,13 +51,16 @@ fun DateInputDialog(
     measurementIcon: MeasurementTypeIcon,
     iconBackgroundColor: Color,
     onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit
+    onConfirm: (Long) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialTimestamp
     )
 
     DatePickerDialog(
+        modifier = overlayRoot(overlayTag ?: "DateInputDialog"),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
@@ -65,13 +70,13 @@ fun DateInputDialog(
                         onConfirm(selectedDate)
                         onDismiss()
                     }
-                }
+                }, modifier = controlTag("Button.dialog_ok")
             ) {
                 Text(stringResource(R.string.dialog_ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }

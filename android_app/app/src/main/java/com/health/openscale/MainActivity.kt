@@ -25,6 +25,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import com.health.openscale.ui.qa.exposeTestTags
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -97,7 +101,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                AppNavigation(sharedViewModel)
+                // Debug builds publish the mqa test tags of this composition root.
+                Box(Modifier.fillMaxSize().exposeTestTags()) {
+                    AppNavigation(sharedViewModel)
+                }
             }
         }
     }

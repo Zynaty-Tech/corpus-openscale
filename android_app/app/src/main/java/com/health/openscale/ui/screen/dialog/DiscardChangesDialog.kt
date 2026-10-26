@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.AlertDialog
@@ -41,8 +43,11 @@ import com.health.openscale.R
 fun DiscardChangesDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "DiscardChangesDialog"),
         onDismissRequest = onDismissRequest,
         icon = { Icon(Icons.Outlined.EditNote, contentDescription = null) },
         title = { Text(stringResource(R.string.dialog_title_discard_changes)) },
@@ -52,7 +57,7 @@ fun DiscardChangesDialog(
                 onClick = {
                     onConfirm()
                     onDismissRequest() // Dismiss the dialog after confirmation
-                }
+                }, modifier = controlTag("Button.action_discard")
             ) {
                 Text(
                     text = stringResource(R.string.action_discard),
@@ -61,7 +66,7 @@ fun DiscardChangesDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            TextButton(onClick = onDismissRequest, modifier = controlTag("Button.action_keep_editing")) {
                 Text(stringResource(R.string.action_keep_editing))
             }
         }

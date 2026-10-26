@@ -56,6 +56,7 @@ fun AssistedWeighingDialog(
             }
         } else {
             UserInputDialog(
+                overlayTag = "AssistedWeighingDialog",
                 title = stringResource(R.string.dialog_title_select_reference_user_for, currentTargetUser.name),
                 users = availableReferenceUsers,
                 initialSelectedId = availableReferenceUsers.firstOrNull()?.id,

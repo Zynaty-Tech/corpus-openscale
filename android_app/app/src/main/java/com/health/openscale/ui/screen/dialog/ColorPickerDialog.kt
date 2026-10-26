@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -68,7 +70,7 @@ fun ColorPickerDialog(
         Surface(
             shape = MaterialTheme.shapes.medium,
             tonalElevation = 8.dp,
-            modifier = Modifier
+            modifier = overlayRoot("ColorPickerDialog")
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
@@ -78,8 +80,8 @@ fun ColorPickerDialog(
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = controlTag("Grid").then(Modifier
+                        .fillMaxWidth()),
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -95,7 +97,7 @@ fun ColorPickerDialog(
                                     color = if (color == currentColor) MaterialTheme.colorScheme.onSurface else Color.Transparent,
                                     shape = CircleShape
                                 )
-                                .clickable {
+                                .then(controlTag("Tap.cancel_button")).clickable {
                                     onColorSelected(color)
                                     onDismiss()
                                 }
@@ -109,7 +111,7 @@ fun ColorPickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                         Text(stringResource(R.string.cancel_button))
                     }
                 }

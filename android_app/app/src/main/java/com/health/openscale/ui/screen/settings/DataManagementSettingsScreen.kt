@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -405,13 +407,13 @@ fun DataManagementSettingsScreen(
     }
 
     LazyColumn(
-        modifier = Modifier
+        modifier = controlTag("List").then(Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp))
     ) {
         items(regularDataManagementItems.size) { index ->
             val item = regularDataManagementItems[index]
-            SettingsCardItem(item.label, icon = item.icon, onClick = item.onClick, enabled = item.enabled, isDestructive = item.isDestructive, isLoading = item.isLoading)
+            SettingsCardItem(item.label, modifier = controlTag("Item_" + item.icon.name.replace('.', '_')), icon = item.icon, onClick = item.onClick, enabled = item.enabled, isDestructive = item.isDestructive, isLoading = item.isLoading)
         }
 
         item {
@@ -455,9 +457,9 @@ fun DataManagementSettingsScreen(
                                 }
                             }
                         },
-                        enabled = !isAnyOperationLoading
+                        enabled = !isAnyOperationLoading, modifier = controlTag("Switch")
                     )
-                }
+                }, modifier = controlTag("Item.settings_enable_auto_backups")
             )
         }
 
@@ -495,7 +497,7 @@ fun DataManagementSettingsScreen(
                                             }
                                         }
                                     },
-                                    enabled = !isAnyOperationLoading
+                                    enabled = !isAnyOperationLoading, modifier = controlTag("IconButton.settings_backup_location_open_error_no_app")
                                 ) {
                                     Icon(Icons.Filled.FolderOpen, contentDescription = stringResource(R.string.content_desc_open_backup_location_icon))
                                 }
@@ -506,12 +508,12 @@ fun DataManagementSettingsScreen(
                                         selectAutoBackupDirectoryLauncher.launch(backupLocationDocumentUri(autoBackupLocationUriString))
                                     }
                                 },
-                                enabled = !isAnyOperationLoading
+                                enabled = !isAnyOperationLoading, modifier = controlTag("IconButton.content_desc_change_backup_location_icon")
                             ) {
                                 Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.content_desc_change_backup_location_icon))
                             }
                         }
-                    }
+                    }, modifier = controlTag("Item.settings_backup_location_label")
                 )
             }
         }
@@ -534,7 +536,7 @@ fun DataManagementSettingsScreen(
                         } else {
                             Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.content_desc_backup_status_icon))
                         }
-                    }
+                    }, modifier = controlTag("Item.settings_last_backup_status_label")
                 )
             }
             item {
@@ -544,7 +546,7 @@ fun DataManagementSettingsScreen(
                     onClick = { if (!isAnyOperationLoading) showBackupIntervalDialog = true },
                     enabled = !isAnyOperationLoading,
                     customLeadingContent = { Icon(Icons.Filled.Schedule, contentDescription = stringResource(R.string.content_desc_backup_interval_icon)) },
-                    trailingContent = { Icon(Icons.Filled.ArrowDropDown, contentDescription = stringResource(R.string.content_desc_change_interval_icon)) }
+                    trailingContent = { Icon(Icons.Filled.ArrowDropDown, contentDescription = stringResource(R.string.content_desc_change_interval_icon)) }, modifier = controlTag("Item.settings_backup_interval_label")
                 )
             }
             item {
@@ -564,9 +566,9 @@ fun DataManagementSettingsScreen(
                                     coroutineScope.launch { settingsViewModel.setAutoBackupCreateNewFile(isChecked) }
                                 }
                             },
-                            enabled = !isAnyOperationLoading
+                            enabled = !isAnyOperationLoading, modifier = controlTag("Switch_2")
                         )
-                    }
+                    }, modifier = controlTag("Item.settings_backup_behavior_label")
                 )
             }
         }
@@ -580,7 +582,7 @@ fun DataManagementSettingsScreen(
             }
             items(destructiveDataManagementItems.size) { index ->
                 val item = destructiveDataManagementItems[index]
-                SettingsCardItem(item.label, icon = item.icon, onClick = item.onClick, enabled = item.enabled, isDestructive = item.isDestructive, isLoading = item.isLoading)
+                SettingsCardItem(item.label, modifier = controlTag("Item_" + item.icon.name.replace('.', '_')), icon = item.icon, onClick = item.onClick, enabled = item.enabled, isDestructive = item.isDestructive, isLoading = item.isLoading)
             }
         }
     }
@@ -595,23 +597,25 @@ fun DataManagementSettingsScreen(
                 coroutineScope.launch { settingsViewModel.setAutoBackupInterval(selectedEnumInterval) }
             },
             optionToDisplayName = { it.getDisplayName(context) },
-            onDismissRequest = { showBackupIntervalDialog = false }
+            onDismissRequest = { showBackupIntervalDialog = false },
+            overlayTag = "BackupIntervalDialog"
         )
     }
 
     if (showDeleteEntireDatabaseConfirmationDialog) {
         AlertDialog(
+            modifier = overlayRoot("DeleteDatabaseDialog"),
             onDismissRequest = { if (!isLoadingEntireDatabaseDeletion) settingsViewModel.cancelDeleteEntireDatabaseConfirmation() },
             icon = { Icon(Icons.Filled.WarningAmber, contentDescription = stringResource(R.string.content_desc_warning_icon), tint = MaterialTheme.colorScheme.error) },
             title = { Text(stringResource(R.string.dialog_title_delete_entire_database_confirmation), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error) },
             text = { Text(stringResource(R.string.dialog_message_delete_entire_database_confirmation)) },
-            confirmButton = { TextButton({ settingsViewModel.confirmDeleteEntireDatabase() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingEntireDatabaseDeletion) { if (isLoadingEntireDatabaseDeletion) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_delete_all)) } },
-            dismissButton = { TextButton({ settingsViewModel.cancelDeleteEntireDatabaseConfirmation() }, enabled = !isLoadingEntireDatabaseDeletion) { Text(stringResource(R.string.cancel_button)) } }
+            confirmButton = { TextButton({ settingsViewModel.confirmDeleteEntireDatabase() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingEntireDatabaseDeletion, modifier = controlTag("Button.button_yes_delete_all")) { if (isLoadingEntireDatabaseDeletion) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_delete_all)) } },
+            dismissButton = { TextButton({ settingsViewModel.cancelDeleteEntireDatabaseConfirmation() }, enabled = !isLoadingEntireDatabaseDeletion, modifier = controlTag("Button.cancel_button")) { Text(stringResource(R.string.cancel_button)) } }
         )
     }
 
     if (showUserSelectionDialogForExport) {
-        UserSelectionDialog(users, { settingsViewModel.proceedWithExportForUser(it) }, { if (!isLoadingExport) settingsViewModel.cancelUserSelectionForExport() }, stringResource(R.string.dialog_title_export_select_user), !isLoadingExport, !isLoadingExport)
+        UserSelectionDialog(users, { settingsViewModel.proceedWithExportForUser(it) }, { if (!isLoadingExport) settingsViewModel.cancelUserSelectionForExport() }, stringResource(R.string.dialog_title_export_select_user), !isLoadingExport, !isLoadingExport, overlayTag = "ExportUserDialog")
     }
 
     if (exportPhotoChoiceUserId != null) {
@@ -622,34 +626,36 @@ fun DataManagementSettingsScreen(
     }
 
     if (showUserSelectionDialogForImport) {
-        UserSelectionDialog(users, { settingsViewModel.proceedWithImportForUser(it) }, { if (!isLoadingImport) settingsViewModel.cancelUserSelectionForImport() }, stringResource(R.string.dialog_title_import_select_user), !isLoadingImport, !isLoadingImport)
+        UserSelectionDialog(users, { settingsViewModel.proceedWithImportForUser(it) }, { if (!isLoadingImport) settingsViewModel.cancelUserSelectionForImport() }, stringResource(R.string.dialog_title_import_select_user), !isLoadingImport, !isLoadingImport, overlayTag = "ImportUserDialog")
     }
 
     if (showUserSelectionDialogForDelete) {
-        UserSelectionDialog(users, { settingsViewModel.proceedWithDeleteForUser(it) }, { if (!isLoadingDeletion) settingsViewModel.cancelUserSelectionForDelete() }, stringResource(R.string.dialog_title_delete_select_user), !isLoadingDeletion, !isLoadingDeletion)
+        UserSelectionDialog(users, { settingsViewModel.proceedWithDeleteForUser(it) }, { if (!isLoadingDeletion) settingsViewModel.cancelUserSelectionForDelete() }, stringResource(R.string.dialog_title_delete_select_user), !isLoadingDeletion, !isLoadingDeletion, overlayTag = "DeleteUserDialog")
     }
 
     if (showDeleteConfirmationDialog) {
         userPendingDeletion?.let { user ->
             AlertDialog(
+                modifier = overlayRoot("DeleteUserDataDialog"),
                 onDismissRequest = { if (!isLoadingDeletion) settingsViewModel.cancelDeleteConfirmation() },
                 icon = { Icon(Icons.Filled.DeleteForever, contentDescription = stringResource(R.string.content_desc_delete_icon), tint = MaterialTheme.colorScheme.error) },
                 title = { Text(stringResource(R.string.dialog_title_delete_user_data_confirmation), fontWeight = FontWeight.Bold) },
                 text = { Text(stringResource(R.string.dialog_message_delete_user_data_confirmation, user.name)) },
-                confirmButton = { TextButton({ settingsViewModel.confirmActualDeletion() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingDeletion) { if (isLoadingDeletion) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_delete_all)) } },
-                dismissButton = { TextButton({ settingsViewModel.cancelDeleteConfirmation() }, enabled = !isLoadingDeletion) { Text(stringResource(R.string.cancel_button)) } }
+                confirmButton = { TextButton({ settingsViewModel.confirmActualDeletion() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingDeletion, modifier = controlTag("Button.button_yes_delete_all_2")) { if (isLoadingDeletion) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_delete_all)) } },
+                dismissButton = { TextButton({ settingsViewModel.cancelDeleteConfirmation() }, enabled = !isLoadingDeletion, modifier = controlTag("Button.cancel_button_2")) { Text(stringResource(R.string.cancel_button)) } }
             )
         }
     }
 
     if (showRestoreConfirmationDialog) {
         AlertDialog(
+            modifier = overlayRoot("RestoreDatabaseDialog"),
             onDismissRequest = { if (!isLoadingRestore) showRestoreConfirmationDialog = false },
             icon = { Icon(Icons.Filled.CloudUpload, contentDescription = stringResource(R.string.content_desc_restore_icon)) },
             title = { Text(stringResource(R.string.dialog_title_restore_database_confirmation), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.dialog_message_restore_database_confirmation)) },
-            confirmButton = { TextButton({ showRestoreConfirmationDialog = false; settingsViewModel.startDatabaseRestore() /* This now triggers SAF event */ }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingRestore) { if (isLoadingRestore) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_restore)) } },
-            dismissButton = { TextButton({ showRestoreConfirmationDialog = false }, enabled = !isLoadingRestore) { Text(stringResource(R.string.cancel_button)) } }
+            confirmButton = { TextButton({ showRestoreConfirmationDialog = false; settingsViewModel.startDatabaseRestore() /* This now triggers SAF event */ }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), enabled = !isLoadingRestore, modifier = controlTag("Button.button_yes_restore")) { if (isLoadingRestore) CircularProgressIndicator(Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.error) else Text(stringResource(R.string.button_yes_restore)) } },
+            dismissButton = { TextButton({ showRestoreConfirmationDialog = false }, enabled = !isLoadingRestore, modifier = controlTag("Button.cancel_button_3")) { Text(stringResource(R.string.cancel_button)) } }
         )
     }
 }
@@ -664,7 +670,8 @@ fun SettingsCardItem(
     isDestructive: Boolean = false,
     isLoading: Boolean = false,
     customLeadingContent: (@Composable () -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null
+    trailingContent: (@Composable () -> Unit)? = null,
+    modifier: Modifier = Modifier
 ) {
     val currentClickable = enabled && !isLoading
     val baseTextColor = if (isDestructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
@@ -673,10 +680,10 @@ fun SettingsCardItem(
     val iconColorToUse = if (!enabled) baseIconColor.copy(alpha = 0.38f) else baseIconColor
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp) // Consistent padding
-            .clickable(enabled = currentClickable, onClick = onClick)
+            .then(controlTag("Tap")).clickable(enabled = currentClickable, onClick = onClick)
     ) {
         ListItem(
             headlineContent = { Text(label, style = MaterialTheme.typography.bodyLarge, color = textColor) },
@@ -705,9 +712,12 @@ fun <T> SelectionDialogEnum(
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
     optionToDisplayName: (T) -> String,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "SelectionDialog"),
         onDismissRequest = onDismissRequest,
         title = { Text(title) },
         text = {
@@ -717,7 +727,7 @@ fun <T> SelectionDialogEnum(
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .selectable(
+                            .then(controlTag("Tap_2")).selectable(
                                 selected = (option == selectedOption),
                                 onClick = {
                                     onOptionSelected(option)
@@ -729,7 +739,7 @@ fun <T> SelectionDialogEnum(
                     ) {
                         RadioButton(
                             selected = (option == selectedOption),
-                            onClick = null // RadioButton is controlled by Row's selectable
+                            onClick = null // RadioButton is controlled by Row's selectable, modifier = controlTag("RadioButton")
                         )
                         Text(
                             text = displayName,
@@ -741,7 +751,7 @@ fun <T> SelectionDialogEnum(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismissRequest) {
+            TextButton(onClick = onDismissRequest, modifier = controlTag("Button.cancel_button_4")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }
@@ -755,7 +765,9 @@ fun UserSelectionDialog(
     onDismiss: () -> Unit,
     title: String,
     confirmButtonEnabled: Boolean = true,
-    itemClickEnabled: Boolean = true
+    itemClickEnabled: Boolean = true,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     if (users.isEmpty()) {
         LaunchedEffect(Unit) { onDismiss() }
@@ -766,6 +778,7 @@ fun UserSelectionDialog(
     val resources = LocalResources.current
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "UserSelectionDialog"),
         onDismissRequest = { if (confirmButtonEnabled) onDismiss() },
         title = { Text(title, style = MaterialTheme.typography.titleLarge) },
         text = {
@@ -812,7 +825,7 @@ fun UserSelectionDialog(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(enabled = itemClickEnabled) {
+                            .then(controlTag("Tap.cancel_button")).clickable(enabled = itemClickEnabled) {
                                 onUserSelected(user.id)
                             }
                             .padding(vertical = 2.dp)
@@ -829,7 +842,7 @@ fun UserSelectionDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss, enabled = confirmButtonEnabled) {
+            TextButton(onClick = onDismiss, enabled = confirmButtonEnabled, modifier = controlTag("Button.cancel_button_5")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }
@@ -846,19 +859,22 @@ fun UserSelectionDialog(
 fun ExportPhotosDialog(
     onDismissRequest: () -> Unit,
     onChoice: (includePhotos: Boolean) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "ExportPhotosDialog"),
         onDismissRequest = onDismissRequest,
         icon = { Icon(Icons.Outlined.PhotoLibrary, contentDescription = null) },
         title = { Text(stringResource(R.string.dialog_title_export_photos)) },
         text = { Text(stringResource(R.string.dialog_message_export_photos)) },
         confirmButton = {
-            TextButton(onClick = { onChoice(true) }) {
+            TextButton(onClick = { onChoice(true) }, modifier = controlTag("Button.action_export_zip_with_photos")) {
                 Text(stringResource(R.string.action_export_zip_with_photos))
             }
         },
         dismissButton = {
-            TextButton(onClick = { onChoice(false) }) {
+            TextButton(onClick = { onChoice(false) }, modifier = controlTag("Button.action_export_csv_only")) {
                 Text(stringResource(R.string.action_export_csv_only))
             }
         }

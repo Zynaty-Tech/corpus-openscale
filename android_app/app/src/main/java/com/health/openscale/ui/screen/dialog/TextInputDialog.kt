@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -54,20 +56,23 @@ fun TextInputDialog(
     measurementIcon: MeasurementTypeIcon,
     iconBackgroundColor: Color,
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (String) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     var value by remember { mutableStateOf(initialValue) }
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "TextInputDialog"),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
                 onConfirm(value)
                 onDismiss()
-            }) { Text(stringResource(R.string.dialog_ok)) }
+            }, modifier = controlTag("Button.dialog_ok")) { Text(stringResource(R.string.dialog_ok)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) { Text(stringResource(R.string.cancel_button)) }
         },
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -85,7 +90,7 @@ fun TextInputDialog(
                 onValueChange = { value = it },
                 label = { Text(stringResource(R.string.dialog_title_input_text)) },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = controlTag("Field.dialog_title_input_text").then(Modifier.fillMaxWidth())
             )
         }
     )

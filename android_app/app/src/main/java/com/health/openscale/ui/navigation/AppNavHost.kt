@@ -47,12 +47,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.health.openscale.R
+import com.health.openscale.ui.qa.ScreenTagged
+import com.health.openscale.ui.qa.screenNameOf
 import com.health.openscale.ui.screen.graph.GraphScreen
 import com.health.openscale.ui.screen.insights.InsightsScreen
 import com.health.openscale.ui.screen.overview.MeasurementDetailScreen
@@ -97,14 +102,14 @@ fun AppNavHost(
                 .weight(1f)      // NavHost takes the remaining space in the Column.
         ) {
             // Define all composable screens for navigation routes.
-            composable(Routes.OVERVIEW) {
+            screen(Routes.OVERVIEW) {
                 OverviewScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
                     bluetoothViewModel = bluetoothViewModel
                 )
             }
-            composable(
+            screen(
                 route = Routes.OVERVIEW_DRILLDOWN,
                 arguments = listOf(
                     navArgument("start") { type = NavType.LongType },
@@ -119,21 +124,21 @@ fun AppNavHost(
                     drillDownEndMillis   = backStackEntry.arguments?.getLong("end"),
                 )
             }
-            composable(Routes.GRAPH) {
+            screen(Routes.GRAPH) {
                 GraphScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
                     bluetoothViewModel = bluetoothViewModel
                 )
             }
-            composable(Routes.TABLE) {
+            screen(Routes.TABLE) {
                 TableScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
                     bluetoothViewModel = bluetoothViewModel
                 )
             }
-            composable(
+            screen(
                 route = Routes.TABLE_DRILLDOWN,
                 arguments = listOf(
                     navArgument("start") { type = NavType.LongType },
@@ -148,7 +153,7 @@ fun AppNavHost(
                     drillDownEndMillis   = backStackEntry.arguments?.getLong("end"),
                 )
             }
-            composable(
+            screen(
                 route = Routes.MEASUREMENT_COMPARISON,
                 arguments = listOf(
                     navArgument("start") { type = NavType.LongType },
@@ -168,21 +173,21 @@ fun AppNavHost(
                         ?: AggregationLevel.NONE,
                 )
             }
-            composable(Routes.STATISTICS) {
+            screen(Routes.STATISTICS) {
                 StatisticsScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
                     bluetoothViewModel = bluetoothViewModel
                 )
             }
-            composable(Routes.INSIGHTS) {
+            screen(Routes.INSIGHTS) {
                 InsightsScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
                     bluetoothViewModel = bluetoothViewModel,
                 )
             }
-            composable(Routes.SETTINGS) {
+            screen(Routes.SETTINGS) {
                 ListDetailRoute(
                     navController = navController,
                     defaultKey = Routes.GENERAL_SETTINGS,
@@ -204,18 +209,21 @@ fun AppNavHost(
                             sharedViewModel.setTopBarTitle(settingsTitle)
                             sharedViewModel.setTopBarActions(emptyList())
                         }
-                        SettingsCategoryScreen(
-                            route = route,
-                            navController = navController,
-                            sharedViewModel = sharedViewModel,
-                            settingsViewModel = settingsViewModel,
-                            bluetoothViewModel = bluetoothViewModel
-                        )
+                        // Two panes: the category shown beside the list is the deeper (winning) tag.
+                        ScreenTagged(screenNameOf(route) ?: route) {
+                            SettingsCategoryScreen(
+                                route = route,
+                                navController = navController,
+                                sharedViewModel = sharedViewModel,
+                                settingsViewModel = settingsViewModel,
+                                bluetoothViewModel = bluetoothViewModel
+                            )
+                        }
                     }
                 )
             }
             settingsCategoryRoutes.forEach { route ->
-                composable(route) {
+                screen(route) {
                     SettingsCategoryScreen(
                         route = route,
                         navController = navController,
@@ -225,7 +233,7 @@ fun AppNavHost(
                     )
                 }
             }
-            composable(
+            screen(
                 route = "${Routes.USER_DETAIL}?id={id}", // Argument in route pattern
                 arguments = listOf(navArgument("id") {
                     type = NavType.IntType
@@ -240,7 +248,7 @@ fun AppNavHost(
                     settingsViewModel = settingsViewModel
                 )
             }
-            composable(
+            screen(
                 route = "${Routes.MEASUREMENT_DETAIL}?measurementId={measurementId}&userId={userId}",
                 arguments = listOf(
                     navArgument("measurementId") {
@@ -262,7 +270,7 @@ fun AppNavHost(
                     sharedViewModel = sharedViewModel
                 )
             }
-            composable(
+            screen(
                 route = "${Routes.MEASUREMENT_TYPE_DETAIL}?id={id}",
                 arguments = listOf(navArgument("id") {
                     type = NavType.IntType
@@ -277,7 +285,7 @@ fun AppNavHost(
                     settingsViewModel = settingsViewModel
                 )
             }
-            composable(Routes.BLUETOOTH_DETAIL) {
+            screen(Routes.BLUETOOTH_DETAIL) {
                 BluetoothDetailScreen(
                     navController = navController,
                     sharedViewModel = sharedViewModel,
@@ -299,6 +307,19 @@ fun AppNavHost(
                 .background(MaterialTheme.colorScheme.surfaceContainer) // Match TopAppBar color or general theme background.
         )
     }
+}
+
+/**
+ * Registers a destination and wraps it in its mqa screen tag. Every destination goes through
+ * here, so a new one is tagged without a second edit (ScreenMapTest checks the name exists).
+ */
+private fun NavGraphBuilder.screen(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    content: @Composable (NavBackStackEntry) -> Unit,
+) {
+    val name = screenNameOf(route) ?: route.substringBefore('?').replace(Regex("[^A-Za-z0-9]"), "_")
+    composable(route = route, arguments = arguments) { entry -> ScreenTagged(name) { content(entry) } }
 }
 
 /** Settings categories listed on the settings screen. */

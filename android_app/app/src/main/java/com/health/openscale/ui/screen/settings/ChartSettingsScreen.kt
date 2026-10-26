@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -144,7 +145,7 @@ fun ChartSettingsScreen(
                     scope.launch {
                         sharedViewModel.setShowChartDataPoints(newValue)
                     }
-                }
+                }, modifier = controlTag("Switch")
             )
         }
 
@@ -166,7 +167,7 @@ fun ChartSettingsScreen(
                     scope.launch {
                         sharedViewModel.setShowChartGoalLines(newValue)
                     }
-                }
+                }, modifier = controlTag("Switch_2")
             )
         }
 
@@ -192,7 +193,7 @@ fun ChartSettingsScreen(
                             scope.launch {
                                 sharedViewModel.setChartProjectionEnabled(newValue)
                             }
-                        }
+                        }, modifier = controlTag("Switch_3")
                     )
                 }
 
@@ -238,7 +239,7 @@ fun ChartSettingsScreen(
                         ExposedDropdownMenuBox(
                             expanded = polyDegreeDropdownExpanded,
                             onExpandedChange = { polyDegreeDropdownExpanded = !polyDegreeDropdownExpanded },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            modifier = controlTag("Dropdown.setting_projection_polynomial_degree").then(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                         ) {
                             OutlinedTextField(
                                 value = selectedPolyDegree.getDisplayName(context),
@@ -246,10 +247,10 @@ fun ChartSettingsScreen(
                                 readOnly = true,
                                 label = { Text(stringResource(R.string.setting_projection_polynomial_degree)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = polyDegreeDropdownExpanded) },
-                                modifier = Modifier
+                                modifier = controlTag("Field.setting_projection_polynomial_degree").then(Modifier
                                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable)
                                     .fillMaxWidth()
-                                    .clickable { polyDegreeDropdownExpanded = true },
+                                    .then(controlTag("Tap")).clickable { polyDegreeDropdownExpanded = true }),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                                     disabledBorderColor = MaterialTheme.colorScheme.outline,
@@ -270,7 +271,7 @@ fun ChartSettingsScreen(
                                                 sharedViewModel.setChartProjectionPolynomialDegree(degreeEnum.degree)
                                             }
                                             polyDegreeDropdownExpanded = false
-                                        }
+                                        }, modifier = controlTag("MenuItem")
                                     )
                                 }
                             }
@@ -285,7 +286,7 @@ fun ChartSettingsScreen(
         ExposedDropdownMenuBox(
             expanded = algorithmDropdownExpanded,
             onExpandedChange = { algorithmDropdownExpanded = !algorithmDropdownExpanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = controlTag("Dropdown.setting_smoothing_algorithm").then(Modifier.fillMaxWidth())
         ) {
             OutlinedTextField(
                 value = selectedAlgorithm.getDisplayName(context),
@@ -293,10 +294,10 @@ fun ChartSettingsScreen(
                 readOnly = true,
                 label = { Text(stringResource(R.string.setting_smoothing_algorithm)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = algorithmDropdownExpanded) },
-                modifier = Modifier
+                modifier = controlTag("Field.setting_smoothing_algorithm").then(Modifier
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable)
                     .fillMaxWidth()
-                    .clickable { algorithmDropdownExpanded = true },
+                    .then(controlTag("Tap_2")).clickable { algorithmDropdownExpanded = true }),
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
@@ -317,7 +318,7 @@ fun ChartSettingsScreen(
                                 sharedViewModel.setChartSmoothingAlgorithm(algorithm)
                             }
                             algorithmDropdownExpanded = false
-                        }
+                        }, modifier = controlTag("MenuItem_2")
                     )
                 }
             }
@@ -413,7 +414,7 @@ private fun IntegerStepper(
                 onClick = {
                     if (value > valueRange.first) onValueChange(value - 1)
                 },
-                enabled = value > valueRange.first
+                enabled = value > valueRange.first, modifier = controlTag("IconButton.trend_decreased_desc")
             ) {
                 Icon(
                     imageVector = Icons.Default.Remove,
@@ -430,7 +431,7 @@ private fun IntegerStepper(
                 onClick = {
                     if (value < valueRange.last) onValueChange(value + 1)
                 },
-                enabled = value < valueRange.last
+                enabled = value < valueRange.last, modifier = controlTag("IconButton.trend_increased_desc")
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

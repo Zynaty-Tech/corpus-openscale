@@ -37,6 +37,9 @@ android {
         manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_round"
 
         testInstrumentationRunner = "com.health.openscale.ScreenshotTestRunner"
+
+        // mqa screen tags: off by default, so a new build type cannot publish them by accident.
+        buildConfigField("boolean", "EXPOSE_TEST_TAGS", "false")
     }
 
     signingConfigs {
@@ -102,6 +105,8 @@ android {
             versionNameSuffix = "-debug"
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_dev"
             manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_dev_round"
+            // mqa screen tags and ids are published in debug only.
+            buildConfigField("boolean", "EXPOSE_TEST_TAGS", "true")
         }
 
         release {
@@ -116,6 +121,8 @@ android {
 
         create("beta") {
             initWith(getByName("debug"))
+            // initWith(debug) copies the debug flag; beta goes to users, so it publishes no tags.
+            buildConfigField("boolean", "EXPOSE_TEST_TAGS", "false")
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
@@ -150,6 +157,9 @@ android {
         // missing or stale one must not fail the build.
         warning += setOf("MissingTranslation", "ExtraTranslation")
     }
+
+    // The mqa screen map is an asset; a BuildConfig flag cannot gate it, so it lives in the
+    // debug source set only (src/debug/assets/mqa-screens.json).
 
     testOptions {
         // JVM unit tests touch android.util.Log (via LogManager); return defaults
@@ -203,6 +213,12 @@ androidComponents {
 // version onto the test APK, and the classes come from the app APK at runtime anyway.
 configurations.matching { it.name.contains("AndroidTest") }.configureEach {
     exclude(group = "androidx.concurrent")
+}
+
+tasks.withType<Test>().configureEach {
+    // ScreenMapTest reads these files; declare them so Gradle re-runs it when they change.
+    inputs.file("src/debug/assets/mqa-screens.json")
+    inputs.dir("src/main/java/com/health/openscale/ui")
 }
 
 dependencies {

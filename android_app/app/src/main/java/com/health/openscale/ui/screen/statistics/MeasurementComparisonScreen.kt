@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.statistics
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -216,7 +217,7 @@ fun MeasurementComparisonScreen(
                     return@Column
                 }
 
-                LazyColumn(Modifier.fillMaxSize()) {
+                LazyColumn(controlTag("List").fillMaxSize()) {
                     items(split.inBoth, key = { it.id }) { type ->
                         if (type.inputType == InputFieldType.IMAGE) {
                             ComparisonPhotoRow(
@@ -342,7 +343,7 @@ private fun DeltaModeSelector(selected: DeltaMode, onSelect: (DeltaMode) -> Unit
             SegmentedButton(
                 selected = mode == selected,
                 onClick = { onSelect(mode) },
-                shape = SegmentedButtonDefaults.itemShape(index, DeltaMode.entries.size),
+                shape = SegmentedButtonDefaults.itemShape(index, DeltaMode.entries.size), modifier = controlTag("SegmentedButton"),
             ) {
                 Text(stringResource(mode.labelResId), style = MaterialTheme.typography.labelLarge)
             }

@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -56,7 +58,9 @@ fun UserInputDialog(
     measurementIcon: MeasurementTypeIcon,
     iconBackgroundColor: Color,
     onDismiss: () -> Unit,
-    onConfirm: (Int?) -> Unit
+    onConfirm: (Int?) -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     var selectedId by remember(users, initialSelectedId) { mutableStateOf(initialSelectedId) }
 
@@ -65,14 +69,15 @@ fun UserInputDialog(
     }
 
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "UserInputDialog"),
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = { onConfirm(selectedId) }) {
+            TextButton(onClick = { onConfirm(selectedId) }, modifier = controlTag("Button.dialog_ok")) {
                 Text(stringResource(R.string.dialog_ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         },
@@ -94,12 +99,12 @@ fun UserInputDialog(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { selectedId = user.id }
+                                .then(controlTag("Tap")).clickable { selectedId = user.id }
                                 .padding(vertical = 8.dp)
                         ) {
                             RadioButton(
                                 selected = (selectedId == user.id),
-                                onClick = { selectedId = user.id }
+                                onClick = { selectedId = user.id }, modifier = controlTag("RadioButton")
                             )
                             Spacer(Modifier.width(12.dp))
                             Text(

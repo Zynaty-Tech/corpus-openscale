@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -346,6 +348,7 @@ fun MeasurementTypeDetailScreen(
         }
 
         AlertDialog(
+            modifier = overlayRoot("FormulaWarningDialog"),
             onDismissRequest = { pendingDialog = null },
             icon= {
                 Icon(
@@ -389,13 +392,13 @@ fun MeasurementTypeDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
-                    )
+                    ), modifier = controlTag("Button.confirm_button")
                 ) {
                     Text(stringResource(R.string.confirm_button))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDialog = null }) {
+                TextButton(onClick = { pendingDialog = null }, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(R.string.cancel_button))
                 }
             }
@@ -442,7 +445,7 @@ fun MeasurementTypeDetailScreen(
         }
 
         OutlinedSettingRow(label = stringResource(R.string.measurement_type_label_enabled)) {
-            Switch(checked = isEnabled, onCheckedChange = { isEnabled = it })
+            Switch(checked = isEnabled, onCheckedChange = { isEnabled = it }, modifier = controlTag("Switch"))
         }
 
         if (!isEdit || originalExistingType?.isBuiltIn() == false) {
@@ -450,7 +453,7 @@ fun MeasurementTypeDetailScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text(stringResource(R.string.measurement_type_label_name)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = controlTag("Field.measurement_type_label_name").then(Modifier.fillMaxWidth()),
             )
         }
 
@@ -458,7 +461,7 @@ fun MeasurementTypeDetailScreen(
             value = "",
             onValueChange = {},
             label = { Text(stringResource(R.string.measurement_type_label_color)) },
-            modifier = Modifier.fillMaxWidth().clickable { showColorPicker = true },
+            modifier = controlTag("Field.measurement_type_label_color").then(Modifier.fillMaxWidth().then(controlTag("Tap.measurement_type_label_icon")).clickable { showColorPicker = true }),
             readOnly = true,
             enabled = false,
             trailingIcon = {
@@ -477,7 +480,7 @@ fun MeasurementTypeDetailScreen(
             value = "",
             onValueChange = {},
             label = { Text(stringResource(R.string.measurement_type_label_icon)) },
-            modifier = Modifier.fillMaxWidth().clickable { showIconPicker = true },
+            modifier = controlTag("Field.measurement_type_label_icon").then(Modifier.fillMaxWidth().then(controlTag("Tap.formula_label_body_fat")).clickable { showIconPicker = true }),
             readOnly = true,
             enabled = false,
             trailingIcon = { MeasurementIcon(icon = selectedIcon.resource) },
@@ -541,13 +544,13 @@ fun MeasurementTypeDetailScreen(
             ExposedDropdownMenuBox(
                 expanded = expandedUnit,
                 onExpandedChange = { expandedUnit = !expandedUnit },
-                modifier = Modifier.fillMaxWidth()
+                modifier = controlTag("Dropdown.measurement_type_label_unit").then(Modifier.fillMaxWidth())
             ) {
                 OutlinedSettingRow(
                     label = stringResource(R.string.measurement_type_label_unit),
                     surfaceModifier = Modifier
                         .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .clickable { expandedUnit = true },
+                        .then(controlTag("Tap")).clickable { expandedUnit = true },
                     controlContent = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -585,7 +588,7 @@ fun MeasurementTypeDetailScreen(
                                 } else {
                                     selectedUnit = unit
                                 }
-                            }
+                            }, modifier = controlTag("MenuItem")
                         )
                     }
                 }
@@ -593,14 +596,14 @@ fun MeasurementTypeDetailScreen(
         }
 
         if (inputTypeDropdownEnabled) {
-            ExposedDropdownMenuBox(expanded = expandedInputType, onExpandedChange = { expandedInputType = !expandedInputType }) {
+            ExposedDropdownMenuBox(expanded = expandedInputType, onExpandedChange = { expandedInputType = !expandedInputType }, modifier = controlTag("Dropdown.measurement_type_label_input_type")) {
                 OutlinedTextField(
                     readOnly = true,
                     value = selectedInputType.name.lowercase().replaceFirstChar { it.uppercase() },
                     onValueChange = {},
                     label = { Text(stringResource(R.string.measurement_type_label_input_type)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInputType) },
-                    modifier = Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth()
+                    modifier = controlTag("Field.measurement_type_label_input_type").then(Modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true).fillMaxWidth())
                 )
                 ExposedDropdownMenu(expanded = expandedInputType, onDismissRequest = { expandedInputType = false }) {
                     allowedInputTypesForKey.forEach { type ->
@@ -612,7 +615,7 @@ fun MeasurementTypeDetailScreen(
                                 if (type == InputFieldType.IMAGE && selectedIcon == MeasurementTypeIcon.IC_DEFAULT) {
                                     selectedIcon = MeasurementTypeIcon.IC_PHOTO
                                 }
-                            }
+                            }, modifier = controlTag("MenuItem_2")
                         )
                     }
                 }
@@ -620,11 +623,11 @@ fun MeasurementTypeDetailScreen(
         }
 
         OutlinedSettingRow(label = stringResource(R.string.measurement_type_label_pinned)) {
-            Switch(checked = isPinned, onCheckedChange = { isPinned = it })
+            Switch(checked = isPinned, onCheckedChange = { isPinned = it }, modifier = controlTag("Switch_2"))
         }
         if (selectedInputType == InputFieldType.FLOAT || selectedInputType == InputFieldType.INT) {
             OutlinedSettingRow(label = stringResource(R.string.measurement_type_label_on_right_y_axis)) {
-                Switch(checked = isOnRightYAxis, onCheckedChange = { isOnRightYAxis = it })
+                Switch(checked = isOnRightYAxis, onCheckedChange = { isOnRightYAxis = it }, modifier = controlTag("Switch_3"))
             }
         }
 
@@ -647,7 +650,7 @@ fun MeasurementTypeDetailScreen(
                         }
                     },
                     textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = controlTag("Field.measurement_type_label_csv_column").then(Modifier.fillMaxWidth())
                 )
             } else {
                 OutlinedSettingRow(label = stringResource(R.string.measurement_type_label_csv_column)) {
@@ -694,6 +697,7 @@ fun MeasurementTypeDetailScreen(
 
     if (formulaInfoTitle != null && formulaInfoText != null) {
         AlertDialog(
+            modifier = overlayRoot("FormulaInfoDialog"),
             onDismissRequest = { formulaInfoTitle = null; formulaInfoText = null },
             icon = {
                 Icon(
@@ -717,7 +721,7 @@ fun MeasurementTypeDetailScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = { formulaInfoTitle = null; formulaInfoText = null }) {
+                TextButton(onClick = { formulaInfoTitle = null; formulaInfoText = null }, modifier = controlTag("Button.dialog_ok")) {
                     Text(stringResource(R.string.dialog_ok))
                 }
             }
@@ -775,13 +779,13 @@ private fun <T> FormulaPickerRow(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = Modifier.fillMaxWidth()
+        modifier = controlTag("Dropdown.Info").then(Modifier.fillMaxWidth())
     ) {
         OutlinedSettingRow(
             label = label,
             surfaceModifier = Modifier
                 .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
-                .clickable { expanded = true },
+                .then(controlTag("Tap_2")).clickable { expanded = true },
             controlContent = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -834,7 +838,7 @@ private fun <T> FormulaPickerRow(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(18.dp)
-                                    .clickable { onInfo(opt) },
+                                    .then(controlTag("Tap_3")).clickable { onInfo(opt) },
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -842,7 +846,7 @@ private fun <T> FormulaPickerRow(
                     onClick = {
                         expanded = false
                         onSelect(opt)
-                    }
+                    }, modifier = controlTag("MenuItem.Info")
                 )
             }
         }

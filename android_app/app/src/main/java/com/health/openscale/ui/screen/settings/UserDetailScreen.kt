@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -178,6 +180,7 @@ fun UserDetailScreen(
 
     if (showDatePicker) {
         DatePickerDialog(
+            modifier = overlayRoot("BirthDatePicker"),
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
@@ -185,12 +188,12 @@ fun UserDetailScreen(
                         birthDate = it
                     }
                     showDatePicker = false
-                }) {
+                }, modifier = controlTag("Button.dialog_ok")) {
                     Text(stringResource(id = R.string.dialog_ok))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
+                TextButton(onClick = { showDatePicker = false }, modifier = controlTag("Button.cancel_button")) {
                     Text(stringResource(id = R.string.cancel_button))
                 }
             }
@@ -321,7 +324,7 @@ fun UserDetailScreen(
             value = name,
             onValueChange = { name = it },
             label = { Text(stringResource(id = R.string.user_detail_label_name)) }, // "Name"
-            modifier = Modifier.fillMaxWidth()
+            modifier = controlTag("Field.user_detail_label_name").fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -338,7 +341,7 @@ fun UserDetailScreen(
             },
             label = { Text(stringResource(R.string.user_detail_label_height)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = controlTag("Field.user_detail_label_height").then(Modifier.fillMaxWidth()),
             singleLine = true,
             trailingIcon = {
                 IconButton(onClick = {
@@ -354,7 +357,7 @@ fun UserDetailScreen(
                         heightValueString = ""
                     }
                     heightInputUnit = newUnit
-                }) {
+                }, modifier = controlTag("IconButton.user_detail_content_description_change_unit")) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -381,7 +384,7 @@ fun UserDetailScreen(
         ExposedDropdownMenuBox(
             expanded = genderExpanded,
             onExpandedChange = { genderExpanded = !genderExpanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = controlTag("Dropdown.user_detail_label_gender").then(Modifier.fillMaxWidth())
         ) {
             OutlinedTextField(
                 value = gender.getDisplayName(LocalContext.current),
@@ -391,9 +394,9 @@ fun UserDetailScreen(
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded)
                 },
-                modifier = Modifier
+                modifier = controlTag("Field.user_detail_label_gender").then(Modifier
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
+                    .fillMaxWidth())
             )
 
             ExposedDropdownMenu(
@@ -407,7 +410,7 @@ fun UserDetailScreen(
                             gender = selectionOption
                             genderExpanded = false
                         },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("MenuItem"),
                     )
                 }
             }
@@ -416,7 +419,7 @@ fun UserDetailScreen(
         ExposedDropdownMenuBox(
             expanded = activityLevelExpanded,
             onExpandedChange = { activityLevelExpanded = !activityLevelExpanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = controlTag("Dropdown.user_detail_label_activity_level").then(Modifier.fillMaxWidth())
         ) {
             OutlinedTextField(
                 value = activityLevel.name.lowercase().replaceFirstChar { it.uppercaseChar().toString() },
@@ -426,9 +429,9 @@ fun UserDetailScreen(
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = activityLevelExpanded)
                 },
-                modifier = Modifier
+                modifier = controlTag("Field.user_detail_label_activity_level").then(Modifier
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable) // Anchors the dropdown menu to this text field
-                    .fillMaxWidth()
+                    .fillMaxWidth())
             )
 
             ExposedDropdownMenu(
@@ -442,7 +445,7 @@ fun UserDetailScreen(
                             activityLevel = selectionOption
                             activityLevelExpanded = false
                         },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, modifier = controlTag("MenuItem_2"),
                     )
                 }
             }
@@ -454,7 +457,7 @@ fun UserDetailScreen(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(stringResource(R.string.amputation_correction_label)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = controlTag("Field.amputation_correction_label").then(Modifier.fillMaxWidth()),
                 singleLine = true,
                 trailingIcon = {
                     Icon(
@@ -466,7 +469,7 @@ fun UserDetailScreen(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .clickable { showAmputationDialog = true }
+                    .then(controlTag("Tap.switch_on")).clickable { showAmputationDialog = true }
             )
         }
 
@@ -475,21 +478,21 @@ fun UserDetailScreen(
                 value = stringResource(if (useAssistedWeighing) R.string.switch_on else R.string.switch_off),
                 onValueChange = {},
                 label = { Text(stringResource(R.string.user_detail_label_assisted_weighting)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = controlTag("Field.switch_on").then(Modifier.fillMaxWidth()),
                 enabled = true,
                 readOnly = true,
                 trailingIcon = {
                     Switch(
                         checked = useAssistedWeighing,
                         onCheckedChange = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = controlTag("Switch").then(Modifier.padding(end = 8.dp))
                     )
                 }
             )
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .clickable { useAssistedWeighing = !useAssistedWeighing }
+                    .then(controlTag("Tap.user_detail_label_birth_date")).clickable { useAssistedWeighing = !useAssistedWeighing }
             )
         }
 
@@ -498,7 +501,7 @@ fun UserDetailScreen(
                 value = dateFormatter.format(Date(birthDate)),
                 onValueChange = {},
                 label = { Text(stringResource(R.string.user_detail_label_birth_date)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = controlTag("Field.user_detail_label_birth_date").then(Modifier.fillMaxWidth()),
                 enabled = true,
                 readOnly = true,
                 trailingIcon = {
@@ -511,7 +514,7 @@ fun UserDetailScreen(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .clickable { showDatePicker = true }
+                    .then(controlTag("Tap.user_detail_goals")).clickable { showDatePicker = true }
             )
         }
 
@@ -525,7 +528,7 @@ fun UserDetailScreen(
                 },
                 onValueChange = {},
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = controlTag("Field.user_detail_goals").then(Modifier.fillMaxWidth()),
                 label = { Text(stringResource(R.string.my_goals_label)) },
                 trailingIcon = {
                     IconButton(onClick = {
@@ -539,7 +542,7 @@ fun UserDetailScreen(
                                 existingGoal = null,
                             )
                         }
-                    }) {
+                    }, modifier = controlTag("IconButton.action_add_measurement_desc")) {
                         Icon(
                             imageVector = Icons.Filled.AddCircleOutline,
                             contentDescription = stringResource(R.string.action_add_measurement_desc),
@@ -556,7 +559,7 @@ fun UserDetailScreen(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     LazyRow(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = controlTag("Row").then(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(pendingUserGoals, key = { it.userId.toString() + "_" + it.measurementTypeId.toString() }) { goal ->
@@ -636,7 +639,7 @@ fun UserIconPicker(
             backgroundTint = iconBackgroundColor,
             iconTint = LocalContentColor.current,
             modifier = Modifier
-                .clickable { showIconPicker = true }
+                .then(controlTag("Tap")).clickable { showIconPicker = true }
         )
 
         if (showIconPicker) {

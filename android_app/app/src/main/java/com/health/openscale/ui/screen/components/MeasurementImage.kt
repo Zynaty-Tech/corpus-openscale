@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.components
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.graphics.ImageDecoder
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
@@ -148,7 +150,7 @@ fun MeasurementImageThumbnail(
             .onSizeChanged { maxPx = maxOf(it.width, it.height) }
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+            .then(if (onClick != null) Modifier.then(controlTag("Tap")).clickable(onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center
     ) {
         val state = if (maxPx > 0) rememberImageState(file, maxPx) else ImageState.Loading
@@ -276,7 +278,7 @@ private fun ComparedImagePane(
 
 @Composable
 private fun ExportImageButton(onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+    IconButton(onClick = onClick, modifier = controlTag("IconButton.content_desc_export_photo")) {
         Icon(
             imageVector = Icons.Filled.FileDownload,
             contentDescription = stringResource(R.string.content_desc_export_photo),
@@ -359,7 +361,7 @@ private fun ImageViewerDialog(
         }
 
         Column(
-            modifier = Modifier
+            modifier = overlayRoot("ImageViewerDialog")
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
@@ -370,7 +372,7 @@ private fun ImageViewerDialog(
                     .statusBarsPadding()
                     .padding(horizontal = 4.dp, vertical = 4.dp)
             ) {
-                IconButton(onClick = onDismiss) {
+                IconButton(onClick = onDismiss, modifier = controlTag("IconButton.content_desc_close_photo")) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = stringResource(R.string.content_desc_close_photo),

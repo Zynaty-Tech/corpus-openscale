@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.components
 
+import com.health.openscale.ui.qa.controlTag
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,7 +83,7 @@ fun UserGoalChip(
     Card(
         modifier = modifier
             .width(CHIP_WIDTH)
-            .clickable(onClick = onClick),
+            .then(controlTag("Tap")).clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(

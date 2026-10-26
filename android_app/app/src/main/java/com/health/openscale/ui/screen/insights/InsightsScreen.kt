@@ -17,6 +17,7 @@
  */
 package com.health.openscale.ui.screen.insights
 
+import com.health.openscale.ui.qa.controlTag
 import android.text.format.DateFormat
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -294,9 +295,9 @@ fun InsightsScreen(
                 )
 
                 LazyColumn(
-                    modifier            = Modifier
+                    modifier            = controlTag("List").then(Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp)),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     // Expanded windows show two cards per row, stretched to the taller one.
@@ -884,7 +885,7 @@ private fun BodyCompositionPlaneCard(pattern: BodyCompositionPattern, modifier: 
                     colors  = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = if (selectedIndex == null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                         labelColor     = if (selectedIndex == null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.50f),
-                    ),
+                    ), modifier = controlTag("Chip.insights_stat_now"),
                 )
                 history.asReversed().forEachIndexed { reversedIdx, p ->
                     val originalIdx = history.size - 1 - reversedIdx
@@ -895,7 +896,7 @@ private fun BodyCompositionPlaneCard(pattern: BodyCompositionPattern, modifier: 
                         colors  = SuggestionChipDefaults.suggestionChipColors(
                             containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                             labelColor     = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.50f),
-                        ),
+                        ), modifier = controlTag("Chip"),
                     )
                 }
             }
@@ -958,7 +959,7 @@ private fun WeekdayPatternCard(pattern: WeekdayPattern, modifier: Modifier = Mod
                             }
                         },
                         state    = tooltipState,
-                        modifier = Modifier.fillMaxHeight().fillMaxWidth(animatedWidth.coerceAtLeast(0.02f)).clickable { tooltipScope.launch { tooltipState.show() } },
+                        modifier = Modifier.fillMaxHeight().fillMaxWidth(animatedWidth.coerceAtLeast(0.02f)).then(controlTag("Tap")).clickable { tooltipScope.launch { tooltipState.show() } },
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) { drawRoundRect(color = barColor, cornerRadius = CornerRadius(4f)) }
                     }
@@ -1039,7 +1040,7 @@ private fun SeasonalPatternCard(pattern: SeasonalPattern, modifier: Modifier = M
                                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
                                 tooltip = { PlainTooltip { Text("${month.getDisplayName(TextStyle.SHORT, locale)} $year\n${LocaleUtils.formatValueForDisplay(avg.toString(), pattern.type.unit)}", style = MaterialTheme.typography.labelSmall) } },
                                 state    = tooltipState,
-                                modifier = Modifier.fillMaxSize().clickable { tooltipScope.launch { tooltipState.show() } },
+                                modifier = Modifier.fillMaxSize().then(controlTag("Tap.insights_seasonal_summary_high")).clickable { tooltipScope.launch { tooltipState.show() } },
                             ) {}
                         }
                     }
@@ -1086,7 +1087,7 @@ private fun AnomaliesCard(
                     AnomalyRow(anomaly, onAnomalyClick)
                 }
                 if (anomalies.size > ANOMALIES_INITIAL_COUNT) {
-                    TextButton(onClick = { showAll = !showAll }, modifier = Modifier.fillMaxWidth()) {
+                    TextButton(onClick = { showAll = !showAll }, modifier = controlTag("Button.ExpandLess").then(Modifier.fillMaxWidth())) {
                         Icon(if (showAll) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
                 }
@@ -1100,7 +1101,7 @@ private fun AnomalyRow(anomaly: MeasurementAnomaly, onAnomalyClick: (Measurement
     val locale        = ComposeLocale.current.platformLocale
     val dateFormatter = remember { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale) }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { onAnomalyClick(anomaly) }) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).then(controlTag("Tap.insights_anomaly_deviation")).clickable { onAnomalyClick(anomaly) }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
@@ -1147,7 +1148,7 @@ private fun InsightCard(
                     SuggestionChip(
                         onClick = {},
                         label   = { Text(stringResource(R.string.insights_confidence_low), style = MaterialTheme.typography.labelSmall) },
-                        colors  = SuggestionChipDefaults.suggestionChipColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f), labelColor = MaterialTheme.colorScheme.onErrorContainer),
+                        colors  = SuggestionChipDefaults.suggestionChipColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f), labelColor = MaterialTheme.colorScheme.onErrorContainer), modifier = controlTag("Chip.insights_confidence_low"),
                     )
                 }
             }
@@ -1204,7 +1205,7 @@ private fun TrendLabel(
         tooltip = { PlainTooltip { Text(tooltipText, style = MaterialTheme.typography.bodySmall) } },
         state   = tooltipState,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { scope.launch { tooltipState.show() } }) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.then(controlTag("Tap_2")).clickable { scope.launch { tooltipState.show() } }) {
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(3.dp))
             Text(label, style = MaterialTheme.typography.labelSmall, color = color)

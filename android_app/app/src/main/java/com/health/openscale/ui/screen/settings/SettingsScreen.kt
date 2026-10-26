@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.screenNameOf
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -147,7 +149,7 @@ fun SettingsScreen(
     }
 
     Column(
-        modifier = Modifier
+        modifier = controlTag("List")
             .fillMaxSize()
             .padding(all = 8.dp) // Add some overall padding to the column
             .verticalScroll(rememberScrollState())
@@ -157,6 +159,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth() // Make card take full width
                     .padding(vertical = 8.dp) // Consistent vertical padding
+                    .then(controlTag("Item." + (screenNameOf(item.route) ?: "Unknown")))
                     .clickable {
                         if (onOpenItem != null) onOpenItem(item.route) else navController.navigate(item.route)
                     }

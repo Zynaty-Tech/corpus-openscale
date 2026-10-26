@@ -17,6 +17,8 @@
  */
 package com.health.openscale.ui.screen.settings
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -266,7 +268,7 @@ fun BluetoothScreen(
                             }
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(onClick = { navController.navigate(Routes.BLUETOOTH_DETAIL) }) {
+                                IconButton(onClick = { navController.navigate(Routes.BLUETOOTH_DETAIL) }, modifier = controlTag("IconButton.content_desc_edit_type")) {
                                     Icon(
                                         imageVector = Icons.Default.Settings,
                                         contentDescription = stringResource(R.string.content_desc_edit_type),
@@ -298,7 +300,7 @@ fun BluetoothScreen(
                                     color = MaterialTheme.colorScheme.error,
                                     modifier = Modifier.weight(1f)
                                 )
-                                TextButton(onClick = { bluetoothViewModel.setDeveloperMode(false) }) {
+                                TextButton(onClick = { bluetoothViewModel.setDeveloperMode(false) }, modifier = controlTag("Button.developer_mode_disable_action")) {
                                     Text(stringResource(R.string.developer_mode_disable_action))
                                 }
                             }
@@ -424,7 +426,7 @@ fun BluetoothScreen(
                         .align(Alignment.Start)
                 )
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = controlTag("List").then(Modifier.weight(1f)),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(scannedDevices, key = { it.address }) { device ->
@@ -474,7 +476,7 @@ private fun ScanButton(
 ) {
     Button(
         onClick = onToggle,
-        modifier = Modifier.fillMaxWidth()
+        modifier = controlTag("Button.stop_scan_button").then(Modifier.fillMaxWidth())
     ) {
         if (isScanning) {
             CircularProgressIndicator(
@@ -508,6 +510,7 @@ private fun CompatibilityAlertDialog(
     val projectUrl = "https://github.com/oliexdev/openScale/"
 
     AlertDialog(
+        modifier = overlayRoot("CompatibilityDialog"),
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.Info, contentDescription = null) },
         title = { Text(stringResource(R.string.compatibility_dialog_title)) },
@@ -520,7 +523,7 @@ private fun CompatibilityAlertDialog(
                         val intent = Intent(Intent.ACTION_VIEW, projectUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = controlTag("Button.go_to_project_website_button").then(Modifier.align(Alignment.End))
                 ) {
                     Text(stringResource(id = R.string.go_to_project_website_button))
                 }
@@ -531,13 +534,13 @@ private fun CompatibilityAlertDialog(
                 onClick = {
                     onConfirm()
                     onDismiss()
-                }
+                }, modifier = controlTag("Button.compatibility_dialog_confirm_button")
             ) {
                 Text(stringResource(R.string.compatibility_dialog_confirm_button))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }
@@ -556,6 +559,7 @@ private fun DeveloperModeAlertDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        modifier = overlayRoot("DeveloperModeDialog"),
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.BugReport, contentDescription = null) },
         title = { Text(stringResource(R.string.developer_mode_dialog_title)) },
@@ -577,13 +581,13 @@ private fun DeveloperModeAlertDialog(
                 onClick = {
                     onConfirm()
                     onDismiss()
-                }
+                }, modifier = controlTag("Button.developer_mode_dialog_confirm_button")
             ) {
                 Text(stringResource(R.string.developer_mode_dialog_confirm_button))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button_2")) {
                 Text(stringResource(R.string.cancel_button))
             }
         }
@@ -618,7 +622,7 @@ private fun CapabilityIconsRow(
 
                 IconButton(onClick = {
                     onExplain(label, impl)
-                }) {
+                }, modifier = controlTag("IconButton")) {
                     Icon(
                         imageVector = cap.icon,
                         contentDescription = label,
@@ -714,7 +718,7 @@ fun DeviceCardItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Box {
-                    IconButton(onClick = { showMenu = true }) {
+                    IconButton(onClick = { showMenu = true }, modifier = controlTag("IconButton.more_options_cd")) {
                         Icon(
                             imageVector = Icons.Filled.MoreVert,
                             contentDescription = stringResource(R.string.more_options_cd)
@@ -730,7 +734,7 @@ fun DeviceCardItem(
                                 onClick = {
                                     showMenu = false
                                     onSavePreferred()
-                                }
+                                }, modifier = controlTag("MenuItem.menu_save_as_preferred")
                             )
                         }
                         DropdownMenuItem(
@@ -738,7 +742,7 @@ fun DeviceCardItem(
                             onClick = {
                                 showMenu = false
                                 onSaveDebug()
-                            }
+                            }, modifier = controlTag("MenuItem.menu_save_as_developer")
                         )
                     }
                 }
@@ -776,7 +780,7 @@ fun PermissionRequestCard(onGrantPermissions: () -> Unit) {
                 stringResource(R.string.permissions_required_message_bluetooth),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Button(onClick = onGrantPermissions) {
+            Button(onClick = onGrantPermissions, modifier = controlTag("Button.grant_permissions_button")) {
                 Text(stringResource(R.string.grant_permissions_button))
             }
         }
@@ -812,7 +816,7 @@ fun EnableBluetoothCard(onEnableBluetooth: () -> Unit) {
                 stringResource(R.string.bluetooth_disabled_message_enable_for_scan),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Button(onClick = onEnableBluetooth) {
+            Button(onClick = onEnableBluetooth, modifier = controlTag("Button.enable_bluetooth_button")) {
                 Text(stringResource(R.string.enable_bluetooth_button))
             }
         }

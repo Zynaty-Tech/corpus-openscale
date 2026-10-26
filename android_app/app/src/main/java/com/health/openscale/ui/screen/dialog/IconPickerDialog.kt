@@ -1,5 +1,7 @@
 package com.health.openscale.ui.screen.dialog
 
+import com.health.openscale.ui.qa.controlTag
+import com.health.openscale.ui.qa.overlayRoot
 import android.R.attr.resource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,9 +35,12 @@ fun IconPickerDialog(
     iconBackgroundColor: Color,
     availableIcons: List<IconResource>,
     onIconSelected: (IconResource) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    /** mqa: the overlay tag kind, when a screen opens this dialog for several purposes. */
+    overlayTag: String? = null,
 ) {
     AlertDialog(
+        modifier = overlayRoot(overlayTag ?: "IconPickerDialog"),
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.dialog_title_select_icon)) },
         text = {
@@ -43,7 +48,7 @@ fun IconPickerDialog(
                 columns = GridCells.Fixed(4),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(24.dp)
+                modifier = controlTag("Grid").then(Modifier.padding(24.dp))
             ) {
                 items(availableIcons) { icon ->
                     RoundMeasurementIcon(
@@ -51,13 +56,13 @@ fun IconPickerDialog(
                         backgroundTint = iconBackgroundColor,
                         iconTint = iconTintColor,
                         size = 28.dp,
-                        modifier = Modifier.clickable { onIconSelected(icon) }
+                        modifier = Modifier.then(controlTag("Tap.cancel_button")).clickable { onIconSelected(icon) }
                     )
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel_button)) }
+            TextButton(onClick = onDismiss, modifier = controlTag("Button.cancel_button")) { Text(stringResource(R.string.cancel_button)) }
         }
     )
 }
